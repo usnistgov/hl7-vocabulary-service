@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: vocabulary-service
+  main: 
+    allow-bean-definition-overriding: true
+
+db:
+  name: vocabulary-service
+  port: 27017
+  host: localhost
