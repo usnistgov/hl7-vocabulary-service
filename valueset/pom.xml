@@ -6,7 +6,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.nist.hit.vs</groupId>
-		<artifactId>vacabulary-service</artifactId>
+		<artifactId>vocabulary-service</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<groupId>gov.nist.hit.vs</groupId>

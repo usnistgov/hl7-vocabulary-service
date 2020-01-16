@@ -8,3 +8,6 @@ db:
   name: vocabulary-service
   port: 27017
   host: localhost
+  
+server:
+  port : 8092

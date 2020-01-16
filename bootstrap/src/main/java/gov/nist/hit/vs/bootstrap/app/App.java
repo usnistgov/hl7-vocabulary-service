@@ -2,6 +2,8 @@ package gov.nist.hit.vs.bootstrap.app;
 
 import java.net.MalformedURLException;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -10,8 +12,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import com.caucho.hessian.client.HessianProxyFactory;
+import com.mongodb.MongoClient;
 
 import ca.uhn.fhir.context.FhirContext;
 import gov.cdc.vocab.service.VocabService;
@@ -19,6 +28,7 @@ import gov.nist.healthcare.vcsms.domain.ClientConfiguration;
 import gov.nist.healthcare.vcsms.domain.RESTClientInfo;
 import gov.nist.healthcare.vcsms.service.impl.NISTVCSMSClientImpl;
 import gov.nist.hit.vs.bootstrap.configuration.SpringBootConfiguration;
+import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
@@ -30,10 +40,14 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @ComponentScan({ "gov.nist.hit.vs" })
 @Configuration
 @EnableSwagger2
-public class App implements CommandLineRunner{
+@EnableScheduling
+public class App implements CommandLineRunner {
 	static String phinvadsUrl = "https://phinvads.cdc.gov/vocabService/v2";
+
+
 	@Autowired
 	SpringBootConfiguration config;
+
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
 
@@ -58,9 +72,10 @@ public class App implements CommandLineRunner{
 
 	@Bean()
 	public NISTVCSMSClientImpl cdcClient() {
-		NISTVCSMSClientImpl client = new NISTVCSMSClientImpl(new ClientConfiguration(config.getProtocol(),
-				config.getRoot(), config.getGroupMnemonic(),
-				config.getNodeID(),config.getFtpHost(), config.getFtpUserName(), config.getFtpUserPassword()),
+
+		NISTVCSMSClientImpl client = new NISTVCSMSClientImpl(
+				new ClientConfiguration(config.getProtocol(), config.getRoot(), config.getGroupMnemonic(),
+						config.getNodeID(), config.getFtpHost(), config.getFtpUserName(), config.getFtpUserPassword()),
 				new RESTClientInfo("1.0.0", "TEST Client"), "/Users/inm1/Desktop/CDCCodes1");
 		return client;
 	}
@@ -74,6 +89,6 @@ public class App implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

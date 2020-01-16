@@ -1,12 +1,11 @@
 package gov.nist.hit.vs.valueset.service.impl;
 
 import java.io.IOException;
-import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
-import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Parameters;
@@ -16,17 +15,22 @@ import org.hl7.fhir.r4.model.UriType;
 import org.hl7.fhir.r4.model.ValueSet;
 import org.hl7.fhir.r4.model.ValueSet.ConceptReferenceComponent;
 import org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent;
+import org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent;
 import org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
-import gov.nist.healthcare.vcsms.domain.DistributionRequestStatus;
-import gov.nist.healthcare.vcsms.domain.RemoteResponse;
 import gov.nist.healthcare.vcsms.service.impl.NISTVCSMSClientImpl;
+import gov.nist.hit.vs.valueset.domain.CDCCode;
 import gov.nist.hit.vs.valueset.domain.CDCValueset;
+import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
+import gov.nist.hit.vs.valueset.domain.Code;
+import gov.nist.hit.vs.valueset.domain.PhinvadsValueset;
+import gov.nist.hit.vs.valueset.repository.CDCValusetMetadataRepository;
 import gov.nist.hit.vs.valueset.repository.CDCValusetRepository;
+import gov.nist.hit.vs.valueset.repository.PhinvadsValuesetRepository;
 import gov.nist.hit.vs.valueset.service.ValuesetService;
 import okhttp3.Call;
 import okhttp3.OkHttpClient;
@@ -35,16 +39,17 @@ import okhttp3.Response;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import gov.cdc.vocab.service.VocabService;
-import gov.cdc.vocab.service.bean.ValueSetConcept;
+import gov.cdc.vocab.service.bean.CodeSystem;
 import gov.cdc.vocab.service.bean.ValueSetVersion;
+import gov.cdc.vocab.service.dto.input.CodeSystemSearchCriteriaDto;
 import gov.cdc.vocab.service.dto.output.ValidateResultDto;
-import gov.cdc.vocab.service.dto.output.ValueSetConceptResultDto;
 import gov.cdc.vocab.service.dto.output.ValueSetResultDto;
 
-@Service("igService")
+@Service("valuesetService")
 public class SimpleValuesetService implements ValuesetService {
 
 	static String fhirUrl = "http://hl7.org/fhir/ValueSet/";
+	static String phinvadsUrl = "https://phinvads.cdc.gov/vads/ViewValueSet.action?oid=";
 	@Autowired
 	FhirContext fhirR4Context;
 
@@ -52,14 +57,20 @@ public class SimpleValuesetService implements ValuesetService {
 	VocabService vocabService;
 
 	@Autowired
+	private PhinvadsValuesetRepository phinvadsValuesetRepository;
+
+	@Autowired
+	private CDCValusetMetadataRepository cdcValusetMetadataRepository;
+
+	@Autowired
 	private CDCValusetRepository cdcValusetRepository;
-	
+
 	@Autowired
 	NISTVCSMSClientImpl cdcClient;
 
 	@Override
 	public String getValuesets(String source, String format) throws IOException {
-		
+
 		switch (source) {
 		case "fhir":
 			return null;
@@ -92,7 +103,6 @@ public class SimpleValuesetService implements ValuesetService {
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
-
 		List<CDCValueset> cdcValuesets = cdcValusetRepository.findAll();
 		Bundle bundle = new Bundle();
 		if (cdcValuesets != null && cdcValuesets.size() > 0) {
@@ -118,14 +128,11 @@ public class SimpleValuesetService implements ValuesetService {
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
 
-		ValueSetResultDto vsSearchResult = null;
-
-		vsSearchResult = vocabService.getAllValueSets();
-		List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
+		List<PhinvadsValueset> valuesets = phinvadsValuesetRepository.findAll();
 		Bundle bundle = new Bundle();
-		if (valueSets != null && valueSets.size() > 0) {
-			bundle.setTotal(valueSets.size());
-			for (gov.cdc.vocab.service.bean.ValueSet vs : valueSets) {
+		if (valuesets != null && valuesets.size() > 0) {
+			bundle.setTotal(valuesets.size());
+			for (PhinvadsValueset vs : valuesets) {
 				ValueSet fhirVs = convertPhinvadsToFhir(vs, false);
 
 				bundle.addEntry().setResource(fhirVs);
@@ -147,29 +154,35 @@ public class SimpleValuesetService implements ValuesetService {
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
+		CDCValuesetMetadata metadata = cdcValusetMetadataRepository.findByName(theValueSetIdentifier);
+		if (metadata != null) {
+			CDCValueset cdcValueset = cdcValusetRepository.findByMetadataId(metadata.getId());
+			if (cdcValueset != null) {
+				ValueSet fhirVs = convertCDCToFhir(cdcValueset, expand);
+				if (meta) {
+					Meta m = fhirVs.getMeta();
+					Parameters parameters = new Parameters();
+					parameters.addParameter().setName("return").setValue(m);
+					String encoded = parser.encodeResourceToString(parameters);
+					return encoded;
+				}
 
-		CDCValueset cdcValueset = cdcValusetRepository.findByName(theValueSetIdentifier);
-		if (cdcValueset != null) {
-			ValueSet fhirVs = convertCDCToFhir(cdcValueset, expand);
-			if (meta) {
-				Meta m = fhirVs.getMeta();
-				Parameters parameters = new Parameters();
-				parameters.addParameter().setName("return").setValue(m);
-				String encoded = parser.encodeResourceToString(parameters);
+				if (expand) {
+
+				}
+				String encoded = parser.encodeResourceToString(fhirVs);
+				return encoded;
+			} else {
+				OperationOutcome oo = new OperationOutcome();
+				oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+				String encoded = parser.encodeResourceToString(oo);
 				return encoded;
 			}
-
-			if (expand) {
-
-			}
-			String encoded = parser.encodeResourceToString(fhirVs);
-			return encoded;
-		} else {
-			OperationOutcome oo = new OperationOutcome();
-			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
-			String encoded = parser.encodeResourceToString(oo);
-			return encoded;
 		}
+		OperationOutcome oo = new OperationOutcome();
+		oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+		String encoded = parser.encodeResourceToString(oo);
+		return encoded;
 
 	}
 
@@ -180,16 +193,10 @@ public class SimpleValuesetService implements ValuesetService {
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
 
-		ValueSetResultDto vsSearchResult = null;
-
-		vsSearchResult = vocabService.getValueSetByOid(theValueSetIdentifier);
-		List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
-
-		gov.cdc.vocab.service.bean.ValueSet vs = null;
-		if (valueSets != null && valueSets.size() > 0) {
-			vs = valueSets.get(0);
+		PhinvadsValueset vs = phinvadsValuesetRepository.findByOid(theValueSetIdentifier);
+		if (vs != null) {
 			System.out.println("Successfully got the metadata from PHINVADS web service for " + theValueSetIdentifier);
-			System.out.println(theValueSetIdentifier + " last updated date is " + vs.getStatusDate().toString());
+			System.out.println(theValueSetIdentifier + " last updated date is " + vs.getUpdateDate().toString());
 			ValueSet fhirVs = convertPhinvadsToFhir(vs, expand);
 			if (meta) {
 				Meta m = fhirVs.getMeta();
@@ -199,9 +206,6 @@ public class SimpleValuesetService implements ValuesetService {
 				return encoded;
 			}
 
-			if (expand) {
-
-			}
 			String encoded = parser.encodeResourceToString(fhirVs);
 			return encoded;
 		} else {
@@ -214,53 +218,49 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
-	public ValueSet convertPhinvadsToFhir(gov.cdc.vocab.service.bean.ValueSet vs, Boolean expand) {
+	public ValueSet convertPhinvadsToFhir(PhinvadsValueset vs, Boolean expand) {
 		ValueSet fhirVs = new ValueSet();
-
+		ValueSetExpansionComponent vsExpansion = new ValueSetExpansionComponent();
 		if (expand) {
-			List<ValueSetVersion> vsvs = vocabService.getValueSetVersionsByValueSetOid(vs.getOid())
-					.getValueSetVersions();
-			if (vsvs != null && vsvs.size() > 0) {
-				fhirVs.setVersion(String.valueOf(vsvs.get(0).getVersionNumber()));
-				ValueSetConceptResultDto vscByVSVid = null;
-				List<ValueSetConcept> valueSetConcepts = null;
-				vscByVSVid = vocabService.getValueSetConceptsByValueSetVersionId(vsvs.get(0).getId(), 1, 500);
-				valueSetConcepts = vscByVSVid.getValueSetConcepts();
-				Extension ext = new Extension();
-//				if (valueSetConcepts != null && valueSetConcepts.size() > 0) {
-//					for (ValueSetConcept pcode : valueSetConcepts) {
-//						CodeSystemSearchCriteriaDto csSearchCritDto = new CodeSystemSearchCriteriaDto();
-//						csSearchCritDto.setCodeSearch(false);
-//						csSearchCritDto.setNameSearch(false);
-//						csSearchCritDto.setOidSearch(true);
-//						csSearchCritDto.setDefinitionSearch(false);
-//						csSearchCritDto.setAssigningAuthoritySearch(false);
-//						csSearchCritDto.setTable396Search(false);
-//						csSearchCritDto.setSearchType(1);
-//						csSearchCritDto.setSearchText(pcode.getCodeSystemOid());
-//						CodeSystem cs = vocabService.findCodeSystems(csSearchCritDto, 1, 5).getCodeSystems().get(0);
-//					}
-//				}
+			if (!vs.getHasPartCodes()) {
+
+				vsExpansion.setTotal(vs.getCodes().size());
+				for (Code code : vs.getCodes()) {
+					ValueSetExpansionContainsComponent contain = new ValueSetExpansionContainsComponent();
+					contain.setCode(code.getValue());
+					contain.setDisplay(code.getDescription());
+					contain.setSystem(code.getCodeSystem());
+					vsExpansion.addContains(contain);
+				}
 			}
 		}
-
-		fhirVs.setName(vs.getCode());
-		fhirVs.setDescription(vs.getDefinitionText());
+		fhirVs.setName(vs.getBindingIdentifier());
+		fhirVs.setDescription(vs.getComment());
 		fhirVs.setId(vs.getOid());
 		fhirVs.setTitle(vs.getName());
+		fhirVs.setUrl(phinvadsUrl.concat(vs.getOid()));
+		fhirVs.setExpansion(vsExpansion);
 		return fhirVs;
 	}
 
 	public ValueSet convertCDCToFhir(CDCValueset vs, Boolean expand) {
 		ValueSet fhirVs = new ValueSet();
-
+		ValueSetExpansionComponent vsExpansion = new ValueSetExpansionComponent();
 		if (expand) {
-
+			vsExpansion.setTotal(vs.getCdcCodes().size());
+			for (CDCCode code : vs.getCdcCodes()) {
+				ValueSetExpansionContainsComponent contain = new ValueSetExpansionContainsComponent();
+				contain.setCode(code.getCode());
+				contain.setDisplay(code.getName());
+//				contain.setSystem(code.getCodeSystem());
+				vsExpansion.addContains(contain);
+			}
 		}
 
-		fhirVs.setName(vs.getName());
-		fhirVs.setId(vs.getPackageUID());
-		fhirVs.setTitle(vs.getTitle());
+		fhirVs.setName(vs.getMetadata().getName());
+		fhirVs.setId(vs.getMetadata().getPackageUID());
+		fhirVs.setTitle(vs.getMetadata().getTitle());
+		fhirVs.setExpansion(vsExpansion);
 		return fhirVs;
 	}
 
@@ -320,15 +320,36 @@ public class SimpleValuesetService implements ValuesetService {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
-		
-		CDCValueset cdcValueset = cdcValusetRepository.findByName(theValueSetIdentifier);
-		String r = null;
-		if(cdcValueset != null) {
-			System.out.println(cdcValueset.getPackageUID());
-			 r = cdcClient.fetchPackage(cdcValueset.getPackageUID());
+
+		CDCValuesetMetadata metadata = cdcValusetMetadataRepository.findByName(theValueSetIdentifier);
+		if (metadata != null) {
+			CDCValueset cdcValueset = cdcValusetRepository.findByMetadataId(metadata.getId());
+			if (cdcValueset != null) {
+				List<CDCCode> codes = cdcValueset.getCdcCodes();
+				CDCCode codeFound = codes.stream().filter(c -> c.getCode().toLowerCase().equals(theCode.toLowerCase())
+						&& c.getSystem().toLowerCase().equals(theSystem.toLowerCase())).findAny().orElse(null);
+				Parameters retVal = new Parameters();
+				retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+				String encoded = parser.encodeResourceToString(retVal);
+				return encoded;
+			}
 		}
-		
-		return r;
+
+		CDCValueset cdcValueset = cdcValusetRepository.findByMetadataName(theValueSetIdentifier);
+		String r = null;
+		if (cdcValueset != null) {
+//			 r = cdcClient.fetchPackage(cdcValueset.getPackageUID());
+//			r = cdcClient.getValuesetString(cdcValueset.getPackageUID());
+			if (r != null) {
+				return r;
+			}
+
+		}
+
+		OperationOutcome oo = new OperationOutcome();
+		oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Value set not found");
+		String encoded = parser.encodeResourceToString(oo);
+		return encoded;
 //		ValueSetResultDto vsSearchResult = vocabService.getValueSetByOid(theValueSetIdentifier);
 //		List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
 //
@@ -357,20 +378,56 @@ public class SimpleValuesetService implements ValuesetService {
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 
-		ValueSetResultDto vsSearchResult = vocabService.getValueSetByOid(theValueSetIdentifier);
-		List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
+		PhinvadsValueset vs = phinvadsValuesetRepository.findByOid(theValueSetIdentifier);
 
-		if (valueSets != null && valueSets.size() > 0) {
-			gov.cdc.vocab.service.bean.ValueSet vs = valueSets.get(0);
-			ValueSetVersion vsv = vocabService.getValueSetVersionsByValueSetOid(vs.getOid()).getValueSetVersions()
-					.get(0);
-			ValidateResultDto result = vocabService.validateConceptValueSetMembership(theSystem, theCode,
-					theValueSetIdentifier, vsv.getVersionNumber());
+		if (vs != null) {
 
-			Parameters retVal = new Parameters();
-			retVal.addParameter().setName("result").setValue(new BooleanType(result.isValid()));
-			String encoded = parser.encodeResourceToString(retVal);
-			return encoded;
+			if (vs.getHasPartCodes().equals(true)) {
+				ValueSetResultDto vsSearchResult = vocabService.getValueSetByOid(theValueSetIdentifier);
+				List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
+				if (valueSets != null && valueSets.size() > 0) {
+					gov.cdc.vocab.service.bean.ValueSet phinvadsValueset = valueSets.get(0);
+					ValueSetVersion vsv = vocabService.getValueSetVersionsByValueSetOid(phinvadsValueset.getOid())
+							.getValueSetVersions().get(0);
+					CodeSystemSearchCriteriaDto csSearchCritDto = new CodeSystemSearchCriteriaDto();
+					csSearchCritDto.setCodeSearch(false);
+					csSearchCritDto.setTable396Search(true);
+					csSearchCritDto.setNameSearch(false);
+					csSearchCritDto.setOidSearch(false);
+					csSearchCritDto.setDefinitionSearch(false);
+					csSearchCritDto.setAssigningAuthoritySearch(false);
+					csSearchCritDto.setSearchType(1);
+					csSearchCritDto.setSearchText(theSystem);
+					List<CodeSystem> css = vocabService.findCodeSystems(csSearchCritDto, 1, 5).getCodeSystems();
+					if (css != null && css.size() > 0) {
+						CodeSystem cs = css.get(0);
+						if (cs != null) {
+							ValidateResultDto result = vocabService.validateConceptValueSetMembership(cs.getOid(),
+									theCode, theValueSetIdentifier, vsv.getVersionNumber());
+							Parameters retVal = new Parameters();
+							retVal.addParameter().setName("result").setValue(new BooleanType(result.isValid()));
+							String encoded = parser.encodeResourceToString(retVal);
+							return encoded;
+						}
+					} else {
+						OperationOutcome oo = new OperationOutcome();
+						oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Code system not found");
+						String encoded = parser.encodeResourceToString(oo);
+						return encoded;
+					}
+
+				}
+			} else {
+				Set<Code> codes = vs.getCodes();
+				Code codeFound = codes.stream()
+						.filter(c -> c.getValue().equals(theCode) && c.getCodeSystem().equals(theSystem)).findAny()
+						.orElse(null);
+				Parameters retVal = new Parameters();
+				retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+				String encoded = parser.encodeResourceToString(retVal);
+				return encoded;
+			}
+
 		}
 
 		OperationOutcome oo = new OperationOutcome();
@@ -402,12 +459,10 @@ public class SimpleValuesetService implements ValuesetService {
 			}
 			List<ConceptSetComponent> includes = vs.getCompose().getInclude();
 			result = validateCodeIsInInclude(includes, theCode, theSystem);
-
 			if (result != null) {
 				String encoded = parser.encodeResourceToString(result);
 				return encoded;
 			}
-
 			OperationOutcome oo = new OperationOutcome();
 			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Code not found");
 			String encoded = parser.encodeResourceToString(oo);
