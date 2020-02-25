@@ -54,6 +54,22 @@ public class CdcServiceImpl implements CdcService {
 		return cdcCodes;
 	}
 
+	@Override
+	public CDCValueset createCDCValueset(CDCValueset cdcValueset) {
+		return cdcValusetRepository.insert(cdcValueset);
+	}
+
+	@Override
+	public CDCValueset saveCDCValueset(CDCValueset cdcValueset) {
+		return cdcValusetRepository.save(cdcValueset);
+	}
+
+	@Override
+	public List<CDCValueset> getCDCValuesetByMetaId(String id) {
+		// TODO Auto-generated method stub
+		return cdcValusetRepository.findByMetadataId(id);
+	}
+
 	public List<CDCCode> parseNDCSale(String codes) {
 		List<CDCCode> cdcCodes = new ArrayList<CDCCode>();
 		Scanner scanner = new Scanner(codes);
@@ -70,6 +86,7 @@ public class CdcServiceImpl implements CdcService {
 		scanner.close();
 		return cdcCodes;
 	}
+
 	public List<CDCCode> parseNDCUse(String codes) {
 		List<CDCCode> cdcCodes = new ArrayList<CDCCode>();
 		Scanner scanner = new Scanner(codes);
@@ -86,7 +103,7 @@ public class CdcServiceImpl implements CdcService {
 		scanner.close();
 		return cdcCodes;
 	}
-	
+
 	public List<CDCCode> parseVISCodes(String codes) {
 		List<CDCCode> cdcCodes = new ArrayList<CDCCode>();
 		Scanner scanner = new Scanner(codes);
@@ -146,22 +163,6 @@ public class CdcServiceImpl implements CdcService {
 		}
 		scanner.close();
 		return cdcCodes;
-	}
-
-	@Override
-	public CDCValueset createCDCValueset(CDCValueset cdcValueset) {
-		return cdcValusetRepository.insert(cdcValueset);
-	}
-
-	@Override
-	public CDCValueset saveCDCValueset(CDCValueset cdcValueset) {
-		return cdcValusetRepository.save(cdcValueset);
-	}
-
-	@Override
-	public CDCValueset getCDCValuesetByMetaId(String id) {
-		// TODO Auto-generated method stub
-		return cdcValusetRepository.findByMetadataId(id);
 	}
 
 }

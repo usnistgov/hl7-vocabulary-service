@@ -3,12 +3,15 @@ package gov.nist.hit.vs.bootstrap.app;
 import java.net.MalformedURLException;
 
 import javax.annotation.PostConstruct;
+import javax.servlet.ServletContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +21,7 @@ import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 import com.caucho.hessian.client.HessianProxyFactory;
 import com.mongodb.MongoClient;
@@ -32,11 +36,12 @@ import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spring.web.paths.RelativePathProvider;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
-@EnableAutoConfiguration
+@EnableAutoConfiguration(exclude = { MongoAutoConfiguration.class, DataSourceAutoConfiguration.class, })
 @ComponentScan({ "gov.nist.hit.vs" })
 @Configuration
 @EnableSwagger2
@@ -44,9 +49,11 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 public class App implements CommandLineRunner {
 	static String phinvadsUrl = "https://phinvads.cdc.gov/vocabService/v2";
 
-
 	@Autowired
 	SpringBootConfiguration config;
+
+	private ServletContext servletContext;
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(App.class, args);
@@ -82,8 +89,22 @@ public class App implements CommandLineRunner {
 
 	@Bean
 	public Docket api() {
-		return new Docket(DocumentationType.SWAGGER_2).select().apis(RequestHandlerSelectors.any())
-				.paths(PathSelectors.any()).build();
+		return new Docket(DocumentationType.SWAGGER_2).pathProvider(new RelativePathProvider(servletContext) {
+			@Override
+			public String getApplicationBasePath() {
+				return ":8095/vocabulary-service";
+			}
+		}).select().apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
+	}
+
+	@Bean
+	public CommonsRequestLoggingFilter requestLoggingFilter() {
+		CommonsRequestLoggingFilter loggingFilter = new CommonsRequestLoggingFilter();
+		loggingFilter.setIncludeClientInfo(true);
+		loggingFilter.setIncludeQueryString(true);
+		loggingFilter.setIncludePayload(true);
+		loggingFilter.setIncludeHeaders(true);
+		return loggingFilter;
 	}
 
 	@Override

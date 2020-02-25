@@ -1,6 +1,7 @@
 package gov.nist.hit.vs.bootstrap.util;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -32,15 +33,20 @@ public class CDCCodesScheduler {
 	@Autowired
 	NISTVCSMSClientImpl cdcClient;
 
-	private static MongoOperations mongoOps = new MongoTemplate(
-			new SimpleMongoDbFactory(new MongoClient(), "vocabulary-service"));
+	@Autowired
+	MongoOperations mongoOps;
+//	private MongoOperations mongoOps = new MongoTemplate(
+//			new SimpleMongoDbFactory(new MongoClient(), "vocabulary-service"));
 
 	@PostConstruct
 	public void initCDCValuesetMetada() {
+		System.out.println("************ INIT CDC VALUESET METADATA");
 		CDCValuesetMetadata cvxMeta = mongoOps.findOne(
 				Query.query(Criteria.where("packageUID").is("419ea9b7-9dd8-e911-a18e-0ecd7015b0a4")),
 				CDCValuesetMetadata.class);
 		if (cvxMeta == null) {
+			System.out.println("************ CVX META NOT FOUND");
+
 			CDCValuesetMetadata cvx = new CDCValuesetMetadata("419ea9b7-9dd8-e911-a18e-0ecd7015b0a4", "CVX",
 					"CDC CVX Report", "2019-09-16T12:19:12.433");
 			mongoOps.save(cvx);
@@ -85,12 +91,13 @@ public class CDCCodesScheduler {
 
 		}
 
-		try {
-			updateCdcCodes();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+//		try {
+//			System.out.println("************ CALLING updateCdcCodes1");
+//			updateCdcCodes();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	@Scheduled(cron = "0 0 1 * * SAT")
@@ -104,20 +111,38 @@ public class CDCCodesScheduler {
 			if (codes != null) {
 				List<CDCCode> cdcCodes = this.cdcService.parseCodes(codes, meta.getPackageUID());
 				System.out.println("Codes found: " + cdcCodes.size());
-				CDCValueset cdcValueSet = this.cdcService.getCDCValuesetByMetaId(meta.getId());
-				if (cdcValueSet == null) {
-					// Create new valueset
-					cdcValueSet = new CDCValueset();
-					cdcValueSet.setMetadata(meta);
-					cdcValueSet.setCdcCodes(cdcCodes);
-					this.cdcService.createCDCValueset(cdcValueSet);
-				} else {
-					// Save valueset with new codes
-					cdcValueSet.setCdcCodes(cdcCodes);
-					this.cdcService.saveCDCValueset(cdcValueSet);
+				// Get the latest valueset from db
+				List<CDCValueset> cdcValueSets = this.cdcService.getCDCValuesetByMetaId(meta.getId());
+				CDCValueset latestCdcValueSet = cdcValueSets.stream()
+						.sorted(Comparator.comparingInt(CDCValueset::getVersion).reversed()).findFirst()
+						.orElse(null);
+				// Create new valueset
+				CDCValueset cdcValueSet = new CDCValueset();
+				cdcValueSet.setMetadata(meta);
+				cdcValueSet.setCdcCodes(cdcCodes);
+				cdcValueSet.setUpdateDate(new Date());
+				if (latestCdcValueSet == null) {
+					cdcValueSet.setVersion(1);
+				} else {					
+					cdcValueSet.setVersion(latestCdcValueSet.getVersion() + 1);
 				}
+				this.cdcService.createCDCValueset(cdcValueSet);
+
+//				if (cdcValueSet == null) {
+//					// Create new valueset
+//					cdcValueSet = new CDCValueset();
+//					cdcValueSet.setMetadata(meta);
+//					cdcValueSet.setVersion("1");
+//					cdcValueSet.setCdcCodes(cdcCodes);
+//					this.cdcService.createCDCValueset(cdcValueSet);
+//				} else {
+//					// Save valueset with new codes
+//					cdcValueSet.setCdcCodes(cdcCodes);
+//					this.cdcService.saveCDCValueset(cdcValueSet);
+//				}
+			} else {
+				System.out.println("No updates found for: " + meta.getName());
 			}
-			System.out.println("No codes found");
 		}
 		System.out.println("Updating CDC codes finished at: " + new Date());
 	}

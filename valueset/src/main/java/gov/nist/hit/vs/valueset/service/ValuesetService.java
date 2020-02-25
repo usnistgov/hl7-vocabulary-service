@@ -23,11 +23,12 @@ import gov.nist.hit.vs.valueset.domain.PhinvadsValueset;
 @Service("valuesetService")
 public interface ValuesetService {
 
-	public String getValuesets(String source, String format) throws IOException;
-	
-	public String getValueset(String source, String theValueSetIdentifier, String format, Boolean meta, Boolean expand) throws IOException;
+	public String getLatestValuesets(String source, String format) throws IOException;
 
-	public String validateCode(String source, String theValueSetIdentifier, String theCode, String theSystem,
-			String format) throws IOException;
-	
+	public String getValueset(String source, String theValueSetIdentifier, String vid, String format, Boolean meta,
+			Boolean expand) throws IOException;
+
+	public String validateCode(String source, String theValueSetIdentifier, String vid, String theCode,
+			String theSystem, String format) throws IOException;
+
 }

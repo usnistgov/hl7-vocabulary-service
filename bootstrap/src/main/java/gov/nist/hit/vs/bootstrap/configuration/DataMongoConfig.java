@@ -31,6 +31,7 @@ public class DataMongoConfig extends AbstractMongoConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
+		System.out.println("********####**** Mongo properties: " + env.getProperty(DB_HOST) + " : " + env.getProperty(DB_PORT) );
 		return new MongoClient(new ServerAddress(env.getProperty(DB_HOST), Integer.parseInt(env.getProperty(DB_PORT))));
 	}
 

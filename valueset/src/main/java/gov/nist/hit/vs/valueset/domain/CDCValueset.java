@@ -1,5 +1,6 @@
 package gov.nist.hit.vs.valueset.domain;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.Id;
@@ -13,7 +14,9 @@ public class CDCValueset {
 	public String id;
 	@DBRef
 	public CDCValuesetMetadata metadata;
+	private int version;
 	public List<CDCCode> cdcCodes;
+	private Date updateDate;
 
 	public String getId() {
 		return id;
@@ -38,5 +41,22 @@ public class CDCValueset {
 	public void setCdcCodes(List<CDCCode> cdcCodes) {
 		this.cdcCodes = cdcCodes;
 	}
+
+	public int getVersion() {
+		return version;
+	}
+
+	public void setVersion(int version) {
+		this.version = version;
+	}
+
+	public Date getUpdateDate() {
+		return updateDate;
+	}
+
+	public void setUpdateDate(Date updateDate) {
+		this.updateDate = updateDate;
+	}
+	
 
 }

@@ -3,11 +3,15 @@ spring:
     name: vocabulary-service
   main: 
     allow-bean-definition-overriding: true
-
 db:
   name: vocabulary-service
   port: 27017
+  #host: vocabulary-service-db
   host: localhost
-  
 server:
-  port : 8092
+  port : 8097
+  
+logging:
+  file: vocabulary-service.log
+  path: /var/log/vocabulary-service/
+  exception-conversion-word: '%wEx'

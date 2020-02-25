@@ -1,9 +1,13 @@
 package gov.nist.hit.vs.valueset.service.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
 import org.hl7.fhir.r4.model.Meta;
@@ -18,6 +22,14 @@ import org.hl7.fhir.r4.model.ValueSet.ConceptSetComponent;
 import org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionComponent;
 import org.hl7.fhir.r4.model.ValueSet.ValueSetExpansionContainsComponent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
@@ -45,6 +57,13 @@ import gov.cdc.vocab.service.dto.input.CodeSystemSearchCriteriaDto;
 import gov.cdc.vocab.service.dto.output.ValidateResultDto;
 import gov.cdc.vocab.service.dto.output.ValueSetResultDto;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sort;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.project;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.replaceRoot;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+
 @Service("valuesetService")
 public class SimpleValuesetService implements ValuesetService {
 
@@ -68,42 +87,72 @@ public class SimpleValuesetService implements ValuesetService {
 	@Autowired
 	NISTVCSMSClientImpl cdcClient;
 
-	@Override
-	public String getValuesets(String source, String format) throws IOException {
+	@Autowired
+	MongoOperations mongoOps;
 
+	@Autowired
+	MongoTemplate mongoTemplate;
+
+	@Override
+	public String getLatestValuesets(String source, String format) throws IOException {
 		switch (source) {
 		case "fhir":
 			return null;
 		case "phinvads":
-			return getPhinvadsValuesets(format);
+			return getLatestPhinvadsValuesets(format);
 		case "cdc":
-			return getCDCValuesets(format);
+			return getLatestCDCValuesets(format);
+		}
+		return null;
+	}
+
+	@Override
+	public String getValueset(String source, String theValueSetIdentifier, String vid, String format, Boolean meta,
+			Boolean expand) throws IOException {
+		switch (source) {
+		case "fhir":
+			return getFhirValueset(theValueSetIdentifier, format, meta, expand);
+		case "phinvads":
+			return getPhinvadsValueset(theValueSetIdentifier, format, vid, meta, expand);
+		case "cdc":
+			return getCDCValueset(theValueSetIdentifier, format, vid, meta, expand);
 		}
 		return null;
 
 	}
 
 	@Override
-	public String getValueset(String source, String theValueSetIdentifier, String format, Boolean meta, Boolean expand)
-			throws IOException {
+	public String validateCode(String source, String theValueSetIdentifier, String vid, String theCode,
+			String theSystem, String format) throws IOException {
+
+		boolean haveCode = theCode != null && theCode.isEmpty() == false;
+		if (!haveCode) {
+			throw new InvalidRequestException("No code provided to validate");
+		}
 		switch (source) {
 		case "fhir":
-			return getFhirValueset(theValueSetIdentifier, format, meta, expand);
+			return validateFhirCode(theValueSetIdentifier, theCode, theSystem, format);
 		case "phinvads":
-			return getPhinvadsValueset(theValueSetIdentifier, format, meta, expand);
+			return validatePhinvadsCode(theValueSetIdentifier, vid, theCode, theSystem, format);
 		case "cdc":
-			return getCDCValueset(theValueSetIdentifier, format, meta, expand);
+			return validateCDCCode(theValueSetIdentifier, vid, theCode, theSystem, format);
 		}
 		return null;
-
 	}
 
-	public String getCDCValuesets(String format) throws IOException {
-
+	public String getLatestCDCValuesets(String format) throws IOException {
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
-		List<CDCValueset> cdcValuesets = cdcValusetRepository.findAll();
+
+		// Query to get all valuesets with the latest version for each one
+		Aggregation aggregation = newAggregation(CDCValueset.class,
+				sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
+				group("metadata").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+		AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
+				CDCValueset.class);
+		List<CDCValueset> cdcValuesets = result.getMappedResults();
+
 		Bundle bundle = new Bundle();
 		if (cdcValuesets != null && cdcValuesets.size() > 0) {
 			bundle.setTotal(cdcValuesets.size());
@@ -122,13 +171,20 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
-	public String getPhinvadsValuesets(String format) throws IOException {
+	public String getLatestPhinvadsValuesets(String format) throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
 
-		List<PhinvadsValueset> valuesets = phinvadsValuesetRepository.findAll();
+		// Query to get all valuesets with the latest version for each one
+		Aggregation aggregation = newAggregation(PhinvadsValueset.class,
+				sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
+				group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+		AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
+				PhinvadsValueset.class);
+		List<PhinvadsValueset> valuesets = result.getMappedResults();
+
 		Bundle bundle = new Bundle();
 		if (valuesets != null && valuesets.size() > 0) {
 			bundle.setTotal(valuesets.size());
@@ -148,7 +204,7 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
-	public String getCDCValueset(String theValueSetIdentifier, String format, Boolean meta, Boolean expand)
+	public String getCDCValueset(String theValueSetIdentifier, String format, String vid, Boolean meta, Boolean expand)
 			throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
@@ -156,7 +212,31 @@ public class SimpleValuesetService implements ValuesetService {
 		parser.setPrettyPrint(true);
 		CDCValuesetMetadata metadata = cdcValusetMetadataRepository.findByName(theValueSetIdentifier);
 		if (metadata != null) {
-			CDCValueset cdcValueset = cdcValusetRepository.findByMetadataId(metadata.getId());
+			CDCValueset cdcValueset = null;
+
+			if (vid != null) {
+				int version = Integer.parseInt(vid);
+
+				Aggregation aggregation = newAggregation(CDCValueset.class,
+						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))
+								.andOperator(Criteria.where("version").is(version))),
+						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
+						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
+						replaceRoot("$doc"));
+				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
+						CDCValueset.class);
+				cdcValueset = result.getUniqueMappedResult();
+
+			} else {
+				Aggregation aggregation = newAggregation(CDCValueset.class,
+						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))),
+						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
+						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
+						replaceRoot("$doc"));
+				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
+						CDCValueset.class);
+				cdcValueset = result.getUniqueMappedResult();
+			}
 			if (cdcValueset != null) {
 				ValueSet fhirVs = convertCDCToFhir(cdcValueset, expand);
 				if (meta) {
@@ -186,14 +266,35 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
-	public String getPhinvadsValueset(String theValueSetIdentifier, String format, Boolean meta, Boolean expand)
-			throws IOException {
+	public String getPhinvadsValueset(String theValueSetIdentifier, String format, String vid, Boolean meta,
+			Boolean expand) throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 		parser.setPrettyPrint(true);
 
-		PhinvadsValueset vs = phinvadsValuesetRepository.findByOid(theValueSetIdentifier);
+		PhinvadsValueset vs = null;
+
+		if (vid != null) {
+			int version = Integer.parseInt(vid);
+			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
+					match(Criteria.where("oid").is(theValueSetIdentifier)
+							.andOperator(Criteria.where("version").is(version))),
+					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
+					PhinvadsValueset.class);
+			vs = result.getUniqueMappedResult();
+
+		} else {
+			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
+					match(Criteria.where("oid").is(theValueSetIdentifier)),
+					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
+					PhinvadsValueset.class);
+			vs = result.getUniqueMappedResult();
+		}
 		if (vs != null) {
 			System.out.println("Successfully got the metadata from PHINVADS web service for " + theValueSetIdentifier);
 			System.out.println(theValueSetIdentifier + " last updated date is " + vs.getUpdateDate().toString());
@@ -240,6 +341,7 @@ public class SimpleValuesetService implements ValuesetService {
 		fhirVs.setTitle(vs.getName());
 		fhirVs.setUrl(phinvadsUrl.concat(vs.getOid()));
 		fhirVs.setExpansion(vsExpansion);
+		fhirVs.setVersion(String.valueOf(vs.getVersion()));
 		return fhirVs;
 	}
 
@@ -260,6 +362,7 @@ public class SimpleValuesetService implements ValuesetService {
 		fhirVs.setName(vs.getMetadata().getName());
 		fhirVs.setId(vs.getMetadata().getPackageUID());
 		fhirVs.setTitle(vs.getMetadata().getTitle());
+		fhirVs.setVersion(String.valueOf(vs.getVersion()));
 		fhirVs.setExpansion(vsExpansion);
 		return fhirVs;
 	}
@@ -296,34 +399,39 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
-	@Override
-	public String validateCode(String source, String theValueSetIdentifier, String theCode, String theSystem,
+	public String validateCDCCode(String theValueSetIdentifier, String vid, String theCode, String theSystem,
 			String format) throws IOException {
-
-		boolean haveCode = theCode != null && theCode.isEmpty() == false;
-		if (!haveCode) {
-			throw new InvalidRequestException("No code provided to validate");
-		}
-		switch (source) {
-		case "fhir":
-			return validateFhirCode(theValueSetIdentifier, theCode, theSystem, format);
-		case "phinvads":
-			return validatePhinvadsCode(theValueSetIdentifier, theCode, theSystem, format);
-		case "cdc":
-			return validateCDCCode(theValueSetIdentifier, theCode, theSystem, format);
-		}
-		return null;
-	}
-
-	public String validateCDCCode(String theValueSetIdentifier, String theCode, String theSystem, String format)
-			throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 
 		CDCValuesetMetadata metadata = cdcValusetMetadataRepository.findByName(theValueSetIdentifier);
+		CDCValueset cdcValueset = null;
+
 		if (metadata != null) {
-			CDCValueset cdcValueset = cdcValusetRepository.findByMetadataId(metadata.getId());
+
+			if (vid != null) {
+				int version = Integer.parseInt(vid);
+
+				Aggregation aggregation = newAggregation(CDCValueset.class,
+						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))
+								.andOperator(Criteria.where("version").is(version))),
+						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
+						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
+						replaceRoot("$doc"));
+				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
+						CDCValueset.class);
+				cdcValueset = result.getUniqueMappedResult();
+			} else {
+				Aggregation aggregation = newAggregation(CDCValueset.class,
+						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))),
+						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
+						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
+						replaceRoot("$doc"));
+				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
+						CDCValueset.class);
+				cdcValueset = result.getUniqueMappedResult();
+			}
 			if (cdcValueset != null) {
 				List<CDCCode> codes = cdcValueset.getCdcCodes();
 				CDCCode codeFound = codes.stream().filter(c -> c.getCode().toLowerCase().equals(theCode.toLowerCase())
@@ -335,11 +443,8 @@ public class SimpleValuesetService implements ValuesetService {
 			}
 		}
 
-		CDCValueset cdcValueset = cdcValusetRepository.findByMetadataName(theValueSetIdentifier);
 		String r = null;
 		if (cdcValueset != null) {
-//			 r = cdcClient.fetchPackage(cdcValueset.getPackageUID());
-//			r = cdcClient.getValuesetString(cdcValueset.getPackageUID());
 			if (r != null) {
 				return r;
 			}
@@ -350,36 +455,35 @@ public class SimpleValuesetService implements ValuesetService {
 		oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Value set not found");
 		String encoded = parser.encodeResourceToString(oo);
 		return encoded;
-//		ValueSetResultDto vsSearchResult = vocabService.getValueSetByOid(theValueSetIdentifier);
-//		List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
-//
-//		if (valueSets != null && valueSets.size() > 0) {
-//			gov.cdc.vocab.service.bean.ValueSet vs = valueSets.get(0);
-//			ValueSetVersion vsv = vocabService.getValueSetVersionsByValueSetOid(vs.getOid()).getValueSetVersions()
-//					.get(0);
-//			ValidateResultDto result = vocabService.validateConceptValueSetMembership(theSystem, theCode,
-//					theValueSetIdentifier, vsv.getVersionNumber());
-//
-//			Parameters retVal = new Parameters();
-//			retVal.addParameter().setName("result").setValue(new BooleanType(result.isValid()));
-//			String encoded = parser.encodeResourceToString(retVal);
-//			return encoded;
-//		}
-//
-//		OperationOutcome oo = new OperationOutcome();
-//		oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Value set not found");
-//		String encoded = parser.encodeResourceToString(oo);
-//		return encoded;
 	}
 
-	public String validatePhinvadsCode(String theValueSetIdentifier, String theCode, String theSystem, String format)
-			throws IOException {
+	public String validatePhinvadsCode(String theValueSetIdentifier, String vid, String theCode, String theSystem,
+			String format) throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
 				: fhirR4Context.newJsonParser();
 
-		PhinvadsValueset vs = phinvadsValuesetRepository.findByOid(theValueSetIdentifier);
+		PhinvadsValueset vs = null;
+		if (vid != null) {
+			int version = Integer.parseInt(vid);
+			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
+					match(Criteria.where("oid").is(theValueSetIdentifier)
+							.andOperator(Criteria.where("version").is(version))),
+					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
+					PhinvadsValueset.class);
+			vs = result.getUniqueMappedResult();
 
+		} else {
+			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
+					match(Criteria.where("oid").is(theValueSetIdentifier)),
+					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
+					PhinvadsValueset.class);
+			vs = result.getUniqueMappedResult();
+		}
 		if (vs != null) {
 
 			if (vs.getHasPartCodes().equals(true)) {
@@ -387,8 +491,8 @@ public class SimpleValuesetService implements ValuesetService {
 				List<gov.cdc.vocab.service.bean.ValueSet> valueSets = vsSearchResult.getValueSets();
 				if (valueSets != null && valueSets.size() > 0) {
 					gov.cdc.vocab.service.bean.ValueSet phinvadsValueset = valueSets.get(0);
-					ValueSetVersion vsv = vocabService.getValueSetVersionsByValueSetOid(phinvadsValueset.getOid())
-							.getValueSetVersions().get(0);
+//					ValueSetVersion vsv = vocabService.getValueSetVersionsByValueSetOid(phinvadsValueset.getOid())
+//							.getValueSetVersions().get(0);
 					CodeSystemSearchCriteriaDto csSearchCritDto = new CodeSystemSearchCriteriaDto();
 					csSearchCritDto.setCodeSearch(false);
 					csSearchCritDto.setTable396Search(true);
@@ -403,7 +507,7 @@ public class SimpleValuesetService implements ValuesetService {
 						CodeSystem cs = css.get(0);
 						if (cs != null) {
 							ValidateResultDto result = vocabService.validateConceptValueSetMembership(cs.getOid(),
-									theCode, theValueSetIdentifier, vsv.getVersionNumber());
+									theCode, theValueSetIdentifier, vs.getVersion());
 							Parameters retVal = new Parameters();
 							retVal.addParameter().setName("result").setValue(new BooleanType(result.isValid()));
 							String encoded = parser.encodeResourceToString(retVal);

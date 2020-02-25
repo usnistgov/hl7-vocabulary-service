@@ -13,8 +13,12 @@ import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 public interface CdcService {
 
 	public List<CDCValuesetMetadata> getCdcValuesetsMetadata();
+
 	public List<CDCCode> parseCodes(String codes, String packageUid);
-	public CDCValueset getCDCValuesetByMetaId(String id);
+
+	public List<CDCValueset> getCDCValuesetByMetaId(String id);
+
 	public CDCValueset createCDCValueset(CDCValueset cdcValueset);
+
 	public CDCValueset saveCDCValueset(CDCValueset cdcValueset);
 }

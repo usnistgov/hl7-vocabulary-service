@@ -1,13 +1,17 @@
 package gov.nist.hit.vs.bootstrap.util;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
@@ -28,6 +32,7 @@ import gov.cdc.vocab.service.dto.input.CodeSystemSearchCriteriaDto;
 import gov.cdc.vocab.service.dto.input.ValueSetSearchCriteriaDto;
 import gov.cdc.vocab.service.dto.output.ValueSetConceptResultDto;
 import gov.cdc.vocab.service.dto.output.ValueSetResultDto;
+import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 import gov.nist.hit.vs.valueset.domain.Code;
 import gov.nist.hit.vs.valueset.domain.PhinvadsValueset;
 
@@ -37,7 +42,10 @@ public class PhinvadsScheduler {
 	private static final Logger log = LoggerFactory.getLogger(PhinvadsScheduler.class);
 
 	private VocabService service;
-	private MongoOperations mongoOps;
+	@Autowired
+	MongoOperations mongoOps;
+//	private MongoOperations mongoOps;
+	
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -47,11 +55,16 @@ public class PhinvadsScheduler {
 		HessianProxyFactory factory = new HessianProxyFactory();
 		try {
 			setService((VocabService) factory.create(VocabService.class, serviceUrl));
-			mongoOps = new MongoTemplate(new SimpleMongoDbFactory(new MongoClient(), "vocabulary-service"));
+//			mongoOps = new MongoTemplate(new SimpleMongoDbFactory(new MongoClient(), "vocabulary-service"));
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
 
+	}
+	@PostConstruct
+	public void initPhinvads() throws IOException {
+		System.out.println("************ INIT PHINVADS VALUESET METADATA1");
+//		reportCurrentTime();
 	}
 
 	// Every 1:00 AM Saturday
@@ -126,7 +139,7 @@ public class PhinvadsScheduler {
 		if (vs != null && vsv != null) {
 			if (table != null) {
 				if (table.getUpdateDate() != null && table.getUpdateDate().equals(vs.getStatusDate())
-						&& table.getVersion().equals(vsv.getVersionNumber() + "")) {
+						&& table.getVersion() == vsv.getVersionNumber()) {
 					if (table.getCodes().size() == 0 && table.getNumberOfCodes() == 0) {
 						vscByVSVid = this.getService().getValueSetConceptsByValueSetVersionId(vsv.getId(), 1, 100000);
 						valueSetConcepts = vscByVSVid.getValueSetConcepts();
@@ -154,7 +167,7 @@ public class PhinvadsScheduler {
 				vscByVSVid = this.getService().getValueSetConceptsByValueSetVersionId(vsv.getId(), 1, 100000);
 			if (valueSetConcepts == null)
 				valueSetConcepts = vscByVSVid.getValueSetConcepts();
-			if (table == null)
+//			if (table == null)
 				table = new PhinvadsValueset();
 
 			List<ValueSetVersion> vsvByVSOid = this.getService().getValueSetVersionsByValueSetOid(vs.getOid())
@@ -165,7 +178,7 @@ public class PhinvadsScheduler {
 				table.setPreDef(vs.getDefinitionText().replaceAll("\u0019s", " "));
 			table.setName(vs.getName());
 			table.setOid(vs.getOid());
-			table.setVersion("" + vsvByVSOid.get(0).getVersionNumber());
+			table.setVersion(vsvByVSOid.get(0).getVersionNumber());
 			table.setScope("PHINVADS");
 //			domainInfo.setScope(Scope.PHINVADS);
 //			table.setStability(Stability.Static);
@@ -209,25 +222,7 @@ public class PhinvadsScheduler {
 
 				mongoOps.save(table);
 				log.info(oid + " Table is updated.");
-				// for (Ig ig : this.igDocs) {
-				// if (ig.getValueSetRegistry().findOneTableById(table.getId()) != null) {
-				// Notification item = new Notification();
-				// item.setByWhom("CDC");
-				// item.setChangedDate(new Date());
-				// item.setTargetType(TargetType.Valueset);
-				// item.setTargetId(table.getId());
-				// Criteria where = Criteria.where("igDocumentId").is(ig.getId());
-				// Query qry = Query.query(where);
-				// Notifications notifications = mongoOps.findOne(qry, Notifications.class);
-				// if (notifications == null) {
-				// notifications = new Notifications();
-				// notifications.setIgDocumentId(ig.getId());
-				// notifications.addItem(item);
-				// }
-				// mongoOps.save(notifications);
-				// notificationEmail(notifications.getId());
-				// }
-				// }
+
 			} catch (Exception e) {
 				e.printStackTrace();
 				return null;

@@ -15,7 +15,6 @@ public class PhinvadsValueset {
 	private String id;
 	@CreatedDate
 	private Date creationDate;
-	@LastModifiedDate
 	private Date updateDate;
 	private String bindingIdentifier;
 	private String oid;
@@ -23,7 +22,7 @@ public class PhinvadsValueset {
 	private int numberOfCodes;
 	private Set<String> codeSystems = new HashSet<String>();
 	private Set<Code> codes = new HashSet<Code>();
-	private String version;
+	private int version;
 	private String comment;
 	private String description;
 	private String name;
@@ -96,11 +95,11 @@ public class PhinvadsValueset {
 		this.updateDate = updateDate;
 	}
 
-	public String getVersion() {
+	public int getVersion() {
 		return version;
 	}
 
-	public void setVersion(String version) {
+	public void setVersion(int version) {
 		this.version = version;
 	}
 
