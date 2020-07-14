@@ -39,6 +39,7 @@
 			<scope>test</scope>
 		</dependency>
 
+
 		<dependency>
 			<groupId>gov.nist.hit.vs</groupId>
 			<artifactId>valueset</artifactId>
@@ -49,9 +50,14 @@
 			<artifactId>fhir-base</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
+		<dependency>
+			<groupId>gov.nist.hit.vs</groupId>
+			<artifactId>auth</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<build>
-	   <finalName>vocabulary-service</finalName>
+		<finalName>vocabulary-service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

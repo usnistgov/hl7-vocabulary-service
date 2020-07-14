@@ -34,18 +34,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import gov.nist.hit.vs.valueset.domain.Code;
 import gov.nist.hit.vs.valueset.service.AphlService;
+import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
-@RequestMapping("/aphl")
 public class AphlController {
-
 
 	@Autowired
 	AphlService aphlService;
 
-	@RequestMapping(value = "/file/upload", method = RequestMethod.POST, produces = { "application/json" })
+	@ApiIgnore
+	@RequestMapping(value = "/upload/aphl", method = RequestMethod.POST, produces = { "application/json" })
 	public String singleFileUpload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-
 		if (file.isEmpty()) {
 			redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
 			return "redirect:uploadStatus";
@@ -60,7 +59,6 @@ public class AphlController {
 
 		String fileName = fileInfo[0];
 		String[] vsInfo = fileName.split("_");
-		System.out.println(vsInfo[1]);
 
 		if (vsInfo.length != 2) {
 			return "Invalid file name. It must be as follows: program_YYYYMMDD.xlsx";
@@ -75,7 +73,6 @@ public class AphlController {
 			e1.printStackTrace();
 			return "Invalid file name. It must be as follows: program_YYYYMMDD.xlsx";
 		}
-		System.out.println(date.toString());
 
 		try {
 			// Get the file and save it somewhere
@@ -100,24 +97,33 @@ public class AphlController {
 							return "Invalid header";
 						}
 					} else {
+
 						Row currentRow = iterator.next();
 						Code c = new Code();
-						c.setValue(currentRow.getCell(1).getStringCellValue());
-						c.setCodeSystem(currentRow.getCell(2).getStringCellValue());
-						if (valuesetsMap.containsKey(currentRow.getCell(0).getStringCellValue())) {
-							valuesetsMap.get(currentRow.getCell(0).getStringCellValue()).add(c);
-						} else {
-							Set<Code> codes = new HashSet<Code>();
-							codes.add(c);
-							valuesetsMap.put(currentRow.getCell(0).getStringCellValue(), codes);
+			
+						try {
+
+							c.setValue(currentRow.getCell(1).getStringCellValue());
+							c.setCodeSystem(currentRow.getCell(2).getStringCellValue());
+							if (valuesetsMap.containsKey(currentRow.getCell(0).getStringCellValue())) {
+								valuesetsMap.get(currentRow.getCell(0).getStringCellValue()).add(c);
+							} else {
+								Set<Code> codes = new HashSet<Code>();
+								codes.add(c);
+								valuesetsMap.put(currentRow.getCell(0).getStringCellValue(), codes);
+							}
+
+						} catch (Exception e) {
+							e.printStackTrace();
+							return "Error in line: " +  Integer.toString(i) ;
 						}
 					}
 					i++;
 				}
 				Files.deleteIfExists(path);
 				System.out.println("Done");
-				aphlService.saveValuesetsFromMap(vsInfo[0], date, valuesetsMap);
-				return "Upload success";
+				int addedVs = aphlService.saveValuesetsFromMap(vsInfo[0].toLowerCase(), date, valuesetsMap);
+				return "Upload success. " + addedVs + " Valuesets added.";
 			}
 			return "Invalid file";
 		} catch (FileNotFoundException e) {

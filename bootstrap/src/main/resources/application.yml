@@ -6,12 +6,13 @@ spring:
 db:
   name: vocabulary-service
   port: 27017
-  #host: vocabulary-service-db
-  host: localhost
+  host: vocabulary-service-db
+  #host: localhost
 server:
-  port : 8097
+  port : 9004
   
 logging:
   file: vocabulary-service.log
   path: /var/log/vocabulary-service/
+  #path: /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap
   exception-conversion-word: '%wEx'

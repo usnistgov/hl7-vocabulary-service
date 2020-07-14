@@ -9,9 +9,7 @@
 		<artifactId>vocabulary-service</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>gov.nist.hit.vs</groupId>
 	<artifactId>valueset</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<name>valueset</name>
 	<url>http://maven.apache.org</url>
 	<properties>
@@ -56,20 +54,7 @@
 			<artifactId>vocab</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger2</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>io.springfox</groupId>
-			<artifactId>springfox-swagger-ui</artifactId>
-			<version>2.9.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>gov.nist.healthcare</groupId>
 			<artifactId>vcsms-client</artifactId>

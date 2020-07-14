@@ -19,6 +19,6 @@ public interface AphlService {
 
 	public List<AphlValueset> getValuesetsByProgram(String program);
 
-	public void saveValuesetsFromMap(String program, Date date, Map<String, Set<Code>> map);
+	public int saveValuesetsFromMap(String program, Date date, Map<String, Set<Code>> map);
 
 }

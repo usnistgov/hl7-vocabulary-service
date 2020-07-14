@@ -1,0 +1,312 @@
+2020-05-08 09:53:27.977  INFO 81614 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Starting App on PN120360.local with PID 81614 (/Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap/target/classes started by inm1 in /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap)
+2020-05-08 09:53:27.995  INFO 81614 --- [main] gov.nist.hit.vs.bootstrap.app.App        : No active profile set, falling back to default profiles: default
+2020-05-08 09:53:28.939  INFO 81614 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+2020-05-08 09:53:28.940  INFO 81614 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+2020-05-08 09:53:29.058  INFO 81614 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 111ms. Found 4 repository interfaces.
+2020-05-08 09:53:29.650  INFO 81614 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$6f098f33] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 09:53:29.657  INFO 81614 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 09:53:29.659  INFO 81614 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@6d303498' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 09:53:29.663  INFO 81614 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$93de31e5] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 09:53:29.668  INFO 81614 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 09:53:30.118  INFO 81614 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 9004 (http)
+2020-05-08 09:53:30.145  INFO 81614 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2020-05-08 09:53:30.146  INFO 81614 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+2020-05-08 09:53:30.156  INFO 81614 --- [main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/inm1/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+2020-05-08 09:53:31.073  INFO 81614 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2020-05-08 09:53:36.523  INFO 81614 --- [main] org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2020-05-08 09:53:36.714  INFO 81614 --- [cluster-ClusterId{value='5eb56460505d1f3ece2896e1', description='null'}-localhost:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:1, serverValue:97}] to localhost:27017
+2020-05-08 09:53:36.721  INFO 81614 --- [cluster-ClusterId{value='5eb56460505d1f3ece2896e1', description='null'}-localhost:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[4, 0, 3]}, minWireVersion=0, maxWireVersion=7, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=3575069}
+2020-05-08 09:53:37.390  INFO 81614 --- [main] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:98}] to localhost:27017
+2020-05-08 09:53:37.572  INFO 81614 --- [main] ca.uhn.fhir.util.VersionUtil             : HAPI FHIR version 4.0.0 - Rev 5ddd6c87bb
+2020-05-08 09:53:37.577  INFO 81614 --- [main] ca.uhn.fhir.context.FhirContext          : Creating new FHIR context for FHIR version [R4]
+2020-05-08 09:53:38.287  INFO 81614 --- [main] pertySourcedRequestMappingHandlerMapping : Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+2020-05-08 09:53:38.473  INFO 81614 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4c176ff1, org.springframework.security.web.context.SecurityContextPersistenceFilter@6e685e6c, org.springframework.security.web.header.HeaderWriterFilter@7708b66a, org.springframework.security.web.authentication.logout.LogoutFilter@5f0f70c7, gov.nist.hit.vs.auth.config.JwtRequestFilter@4735d6e5, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@9d3d54e, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6206b4a7, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@27c53c32, org.springframework.security.web.session.SessionManagementFilter@23ee2ccf, org.springframework.security.web.access.ExceptionTranslationFilter@6ddc67d0, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@3e6748ae]
+2020-05-08 09:53:38.680  INFO 81614 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2020-05-08 09:53:38.785  WARN 81614 --- [main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+2020-05-08 09:53:38.948  INFO 81614 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+2020-05-08 09:53:38.992  INFO 81614 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Context refreshed
+2020-05-08 09:53:39.037  INFO 81614 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Found 1 custom documentation plugin(s)
+2020-05-08 09:53:39.076  INFO 81614 --- [main] s.d.s.w.s.ApiListingReferenceScanner     : Scanning for api listing references
+2020-05-08 09:53:39.343  INFO 81614 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 9004 (http) with context path ''
+2020-05-08 09:53:39.345  INFO 81614 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Started App in 31.923 seconds (JVM running for 34.46)
+2020-05-08 09:54:03.442  INFO 81614 --- [http-nio-9004-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2020-05-08 09:54:03.477  WARN 81614 --- [http-nio-9004-exec-2] g.n.hit.vs.auth.config.JwtRequestFilter  : JWT Token does not begin with Bearer String
+2020-05-08 09:54:14.816  WARN 81614 --- [http-nio-9004-exec-3] g.n.hit.vs.auth.config.JwtRequestFilter  : JWT Token does not begin with Bearer String
+2020-05-08 09:55:03.248 ERROR 81614 --- [http-nio-9004-exec-4] o.a.c.c.C.[.[.[/].[dispatcherServlet]    : Servlet.service() for servlet [dispatcherServlet] in context with path [] threw exception [Request processing failed; nested exception is java.lang.IllegalStateException: Cannot get a STRING value from a NUMERIC cell] with root cause
+
+java.lang.IllegalStateException: Cannot get a STRING value from a NUMERIC cell
+	at org.apache.poi.xssf.usermodel.XSSFCell.typeMismatch(XSSFCell.java:1035)
+	at org.apache.poi.xssf.usermodel.XSSFCell.getRichStringCellValue(XSSFCell.java:390)
+	at org.apache.poi.xssf.usermodel.XSSFCell.getStringCellValue(XSSFCell.java:342)
+	at gov.nist.hit.vs.valueset.controller.AphlController.singleFileUpload(AphlController.java:103)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.springframework.web.method.support.InvocableHandlerMethod.doInvoke(InvocableHandlerMethod.java:189)
+	at org.springframework.web.method.support.InvocableHandlerMethod.invokeForRequest(InvocableHandlerMethod.java:138)
+	at org.springframework.web.servlet.mvc.method.annotation.ServletInvocableHandlerMethod.invokeAndHandle(ServletInvocableHandlerMethod.java:102)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.invokeHandlerMethod(RequestMappingHandlerAdapter.java:895)
+	at org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.handleInternal(RequestMappingHandlerAdapter.java:800)
+	at org.springframework.web.servlet.mvc.method.AbstractHandlerMethodAdapter.handle(AbstractHandlerMethodAdapter.java:87)
+	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1038)
+	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:942)
+	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1005)
+	at org.springframework.web.servlet.FrameworkServlet.doPost(FrameworkServlet.java:908)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:660)
+	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:882)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:741)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:231)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:53)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.AbstractRequestLoggingFilter.doFilterInternal(AbstractRequestLoggingFilter.java:262)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:101)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:320)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.invoke(FilterSecurityInterceptor.java:127)
+	at org.springframework.security.web.access.intercept.FilterSecurityInterceptor.doFilter(FilterSecurityInterceptor.java:91)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:137)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:111)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:170)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at gov.nist.hit.vs.auth.config.JwtRequestFilter.doFilterInternal(JwtRequestFilter.java:69)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:116)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:74)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.context.SecurityContextPersistenceFilter.doFilter(SecurityContextPersistenceFilter.java:105)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:56)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.springframework.security.web.FilterChainProxy$VirtualFilterChain.doFilter(FilterChainProxy.java:334)
+	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:215)
+	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:178)
+	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:357)
+	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:270)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:99)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:92)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.HiddenHttpMethodFilter.doFilterInternal(HiddenHttpMethodFilter.java:93)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:200)
+	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:107)
+	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
+	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:166)
+	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:200)
+	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:96)
+	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:490)
+	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:139)
+	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:92)
+	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:74)
+	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:343)
+	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:408)
+	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:66)
+	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:834)
+	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1415)
+	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:49)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61)
+	at java.lang.Thread.run(Thread.java:748)
+
+2020-05-08 10:01:09.141  INFO 81614 --- [Thread-3] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+2020-05-08 10:01:09.143  INFO 81614 --- [Thread-3] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+2020-05-08 10:02:19.455  INFO 82188 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Starting App on PN120360.local with PID 82188 (/Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap/target/classes started by inm1 in /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap)
+08-05-2020 10:02:19.455 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStarting - Starting App on PN120360.local with PID 82188 (/Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap/target/classes started by inm1 in /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap)
+2020-05-08 10:02:19.458  INFO 82188 --- [main] gov.nist.hit.vs.bootstrap.app.App        : No active profile set, falling back to default profiles: default
+08-05-2020 10:02:19.458 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStartupProfileInfo - No active profile set, falling back to default profiles: default
+2020-05-08 10:02:20.176  INFO 82188 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+08-05-2020 10:02:20.176 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.multipleStoresDetected - Multiple Spring Data modules found, entering strict repository configuration mode!
+2020-05-08 10:02:20.177  INFO 82188 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+08-05-2020 10:02:20.177 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Bootstrapping Spring Data repositories in DEFAULT mode.
+2020-05-08 10:02:20.278  INFO 82188 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96ms. Found 4 repository interfaces.
+08-05-2020 10:02:20.278 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Finished Spring Data repository scanning in 96ms. Found 4 repository interfaces.
+2020-05-08 10:02:20.782  INFO 82188 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$5f512480] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:02:20.782 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$5f512480] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:02:20.789  INFO 82188 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:02:20.789 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:02:20.790  INFO 82188 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@3872bc37' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:02:20.790 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@3872bc37' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:02:20.792  INFO 82188 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$8425c732] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:02:20.792 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$8425c732] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:02:20.796  INFO 82188 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:02:20.796 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:02:21.205  INFO 82188 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 9004 (http)
+08-05-2020 10:02:21.205 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer.initialize - Tomcat initialized with port(s): 9004 (http)
+2020-05-08 10:02:21.231  INFO 82188 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+08-05-2020 10:02:21.231 [main] INFO  o.a.catalina.core.StandardService.log - Starting service [Tomcat]
+2020-05-08 10:02:21.232  INFO 82188 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+08-05-2020 10:02:21.232 [main] INFO  o.a.catalina.core.StandardEngine.log - Starting Servlet engine: [Apache Tomcat/9.0.16]
+2020-05-08 10:02:21.242  INFO 82188 --- [main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/inm1/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+08-05-2020 10:02:21.242 [main] INFO  o.a.c.core.AprLifecycleListener.log - The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/inm1/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+2020-05-08 10:02:22.113  INFO 82188 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+08-05-2020 10:02:22.113 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/].log - Initializing Spring embedded WebApplicationContext
+08-05-2020 10:02:22.114 [main] DEBUG o.s.web.context.ContextLoader.prepareWebApplicationContext - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+08-05-2020 10:02:22.114 [main] INFO  o.s.web.context.ContextLoader.prepareWebApplicationContext - Root WebApplicationContext: initialization completed in 2622 ms
+2020-05-08 10:02:27.431  INFO 82188 --- [main] org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+08-05-2020 10:02:27.431 [main] INFO  org.mongodb.driver.cluster.info - Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2020-05-08 10:02:27.500  INFO 82188 --- [cluster-ClusterId{value='5eb56673505d1f410c799d2e', description='null'}-localhost:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:1, serverValue:99}] to localhost:27017
+08-05-2020 10:02:27.500 [cluster-ClusterId{value='5eb56673505d1f410c799d2e', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection.info - Opened connection [connectionId{localValue:1, serverValue:99}] to localhost:27017
+2020-05-08 10:02:27.506  INFO 82188 --- [cluster-ClusterId{value='5eb56673505d1f410c799d2e', description='null'}-localhost:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[4, 0, 3]}, minWireVersion=0, maxWireVersion=7, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=2994305}
+08-05-2020 10:02:27.506 [cluster-ClusterId{value='5eb56673505d1f410c799d2e', description='null'}-localhost:27017] INFO  org.mongodb.driver.cluster.info - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[4, 0, 3]}, minWireVersion=0, maxWireVersion=7, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=2994305}
+08-05-2020 10:02:27.830 [main] DEBUG o.s.w.f.CommonsRequestLoggingFilter.init - Filter 'requestLoggingFilter' configured for use
+2020-05-08 10:02:28.032  INFO 82188 --- [main] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:100}] to localhost:27017
+08-05-2020 10:02:28.032 [main] INFO  org.mongodb.driver.connection.info - Opened connection [connectionId{localValue:2, serverValue:100}] to localhost:27017
+2020-05-08 10:02:28.170  INFO 82188 --- [main] ca.uhn.fhir.util.VersionUtil             : HAPI FHIR version 4.0.0 - Rev 5ddd6c87bb
+08-05-2020 10:02:28.170 [main] INFO  ca.uhn.fhir.util.VersionUtil.initialize - HAPI FHIR version 4.0.0 - Rev 5ddd6c87bb
+2020-05-08 10:02:28.176  INFO 82188 --- [main] ca.uhn.fhir.context.FhirContext          : Creating new FHIR context for FHIR version [R4]
+08-05-2020 10:02:28.176 [main] INFO  ca.uhn.fhir.context.FhirContext.<init> - Creating new FHIR context for FHIR version [R4]
+08-05-2020 10:02:28.722 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping.handlerMethodsInitialized - 17 mappings in 'requestMappingHandlerMapping'
+2020-05-08 10:02:28.802  INFO 82188 --- [main] pertySourcedRequestMappingHandlerMapping : Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+08-05-2020 10:02:28.802 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping.initHandlerMethods - Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+2020-05-08 10:02:28.944  INFO 82188 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@582a3b19, org.springframework.security.web.context.SecurityContextPersistenceFilter@3ca3648, org.springframework.security.web.header.HeaderWriterFilter@4f811029, org.springframework.security.web.authentication.logout.LogoutFilter@79cb8ffa, gov.nist.hit.vs.auth.config.JwtRequestFilter@7161457, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@39f0c343, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@11eec06b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2b0454d2, org.springframework.security.web.session.SessionManagementFilter@7f0d8eff, org.springframework.security.web.access.ExceptionTranslationFilter@3f68a7f8, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@49491770]
+08-05-2020 10:02:28.944 [main] INFO  o.s.s.web.DefaultSecurityFilterChain.<init> - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@582a3b19, org.springframework.security.web.context.SecurityContextPersistenceFilter@3ca3648, org.springframework.security.web.header.HeaderWriterFilter@4f811029, org.springframework.security.web.authentication.logout.LogoutFilter@79cb8ffa, gov.nist.hit.vs.auth.config.JwtRequestFilter@7161457, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@39f0c343, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@11eec06b, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@2b0454d2, org.springframework.security.web.session.SessionManagementFilter@7f0d8eff, org.springframework.security.web.access.ExceptionTranslationFilter@3f68a7f8, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@49491770]
+08-05-2020 10:02:29.020 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping.registerHandlers - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+2020-05-08 10:02:29.145  INFO 82188 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:02:29.145 [main] INFO  o.s.s.c.ThreadPoolTaskExecutor.initialize - Initializing ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:02:29.176 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter.initControllerAdviceCache - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+08-05-2020 10:02:29.230 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping.registerHandlers - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+08-05-2020 10:02:29.241 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver.initExceptionHandlerAdviceCache - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2020-05-08 10:02:29.296  WARN 82188 --- [main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+08-05-2020 10:02:29.296 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration.checkTemplateLocationExists - Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+2020-05-08 10:02:29.472  INFO 82188 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+08-05-2020 10:02:29.472 [main] INFO  o.s.s.c.ThreadPoolTaskScheduler.initialize - Initializing ExecutorService 'taskScheduler'
+2020-05-08 10:02:29.519  INFO 82188 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Context refreshed
+08-05-2020 10:02:29.519 [main] INFO  s.d.s.w.p.DocumentationPluginsBootstrapper.start - Context refreshed
+2020-05-08 10:02:29.549  INFO 82188 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Found 1 custom documentation plugin(s)
+08-05-2020 10:02:29.549 [main] INFO  s.d.s.w.p.DocumentationPluginsBootstrapper.start - Found 1 custom documentation plugin(s)
+2020-05-08 10:02:29.580  INFO 82188 --- [main] s.d.s.w.s.ApiListingReferenceScanner     : Scanning for api listing references
+08-05-2020 10:02:29.580 [main] INFO  s.d.s.w.s.ApiListingReferenceScanner.scan - Scanning for api listing references
+2020-05-08 10:02:29.806  INFO 82188 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 9004 (http) with context path ''
+08-05-2020 10:02:29.806 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer.start - Tomcat started on port(s): 9004 (http) with context path ''
+2020-05-08 10:02:29.808  INFO 82188 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Started App in 30.679 seconds (JVM running for 31.993)
+08-05-2020 10:02:29.808 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStarted - Started App in 30.679 seconds (JVM running for 31.993)
+2020-05-08 10:02:30.182  INFO 82188 --- [http-nio-9004-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+08-05-2020 10:02:30.182 [http-nio-9004-exec-2] INFO  o.a.c.c.C.[Tomcat].[localhost].[/].log - Initializing Spring DispatcherServlet 'dispatcherServlet'
+08-05-2020 10:02:30.182 [http-nio-9004-exec-2] INFO  o.s.web.servlet.DispatcherServlet.initServletBean - Initializing Servlet 'dispatcherServlet'
+08-05-2020 10:02:30.182 [http-nio-9004-exec-2] DEBUG o.s.web.servlet.DispatcherServlet.initMultipartResolver - Detected StandardServletMultipartResolver
+08-05-2020 10:02:30.192 [http-nio-9004-exec-2] DEBUG o.s.web.servlet.DispatcherServlet.initServletBean - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+08-05-2020 10:02:30.192 [http-nio-9004-exec-2] INFO  o.s.web.servlet.DispatcherServlet.initServletBean - Completed initialization in 10 ms
+08-05-2020 10:02:30.505 [http-nio-9004-exec-2] DEBUG o.s.w.f.CommonsRequestLoggingFilter.beforeRequest - Before request [uri=/upload/aphl;client=0:0:0:0:0:0:0:1;user=admin-nist;headers=[authorization:"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbi1uaXN0IiwiZXhwIjoxNTg4OTY0MDU1LCJpYXQiOjE1ODg5NDYwNTV9.A7IBIsUOwQ_ABNQ1J5fm96nMaDsWUQGZpvGConEiDlecQZyfvQm7nFs3KH03IGDqjYAuHknSZFCT50DQC0ZKfw", user-agent:"PostmanRuntime/7.23.0", accept:"*/*", cache-control:"no-cache", postman-token:"f6b06039-7c02-4705-a98c-b2bac44b6973", host:"localhost:9004", accept-encoding:"gzip, deflate, br", content-length:"63369", connection:"keep-alive", Content-Type:"multipart/form-data;boundary=--------------------------712524442763798029265427;charset=UTF-8"]]
+08-05-2020 10:02:30.507 [http-nio-9004-exec-2] DEBUG o.s.web.servlet.DispatcherServlet.traceDebug - POST "/upload/aphl", parameters={}
+08-05-2020 10:02:30.516 [http-nio-9004-exec-2] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping.getHandler - Mapped to public java.lang.String gov.nist.hit.vs.valueset.controller.AphlController.singleFileUpload(org.springframework.web.multipart.MultipartFile,org.springframework.web.servlet.mvc.support.RedirectAttributes)
+08-05-2020 10:02:31.179 [http-nio-9004-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor.writeWithMessageConverters - Using 'application/json', given [*/*] and supported [application/json]
+08-05-2020 10:02:31.180 [http-nio-9004-exec-2] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor.traceDebug - Writing ["805"]
+08-05-2020 10:02:31.184 [http-nio-9004-exec-2] DEBUG o.s.web.servlet.DispatcherServlet.logResult - Completed 200 OK
+08-05-2020 10:02:31.185 [http-nio-9004-exec-2] DEBUG o.s.w.f.CommonsRequestLoggingFilter.afterRequest - After request [uri=/upload/aphl;client=0:0:0:0:0:0:0:1;user=admin-nist;headers=[authorization:"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbi1uaXN0IiwiZXhwIjoxNTg4OTY0MDU1LCJpYXQiOjE1ODg5NDYwNTV9.A7IBIsUOwQ_ABNQ1J5fm96nMaDsWUQGZpvGConEiDlecQZyfvQm7nFs3KH03IGDqjYAuHknSZFCT50DQC0ZKfw", user-agent:"PostmanRuntime/7.23.0", accept:"*/*", cache-control:"no-cache", postman-token:"f6b06039-7c02-4705-a98c-b2bac44b6973", host:"localhost:9004", accept-encoding:"gzip, deflate, br", content-length:"63369", connection:"keep-alive", Content-Type:"multipart/form-data;boundary=--------------------------712524442763798029265427;charset=UTF-8"]]
+2020-05-08 10:03:02.933  INFO 82188 --- [Thread-3] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+08-05-2020 10:03:02.933 [Thread-3] INFO  o.s.s.c.ThreadPoolTaskScheduler.shutdown - Shutting down ExecutorService 'taskScheduler'
+2020-05-08 10:03:02.935  INFO 82188 --- [Thread-3] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:03:02.935 [Thread-3] INFO  o.s.s.c.ThreadPoolTaskExecutor.shutdown - Shutting down ExecutorService 'applicationTaskExecutor'
+2020-05-08 10:03:28.920  INFO 82320 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Starting App on PN120360.local with PID 82320 (/Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap/target/classes started by inm1 in /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap)
+08-05-2020 10:03:28.920 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStarting - Starting App on PN120360.local with PID 82320 (/Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap/target/classes started by inm1 in /Users/inm1/Desktop/Projects/Vocabulary_Service/Vocabulary_Service/vocabulary-service/bootstrap)
+2020-05-08 10:03:28.923  INFO 82320 --- [main] gov.nist.hit.vs.bootstrap.app.App        : No active profile set, falling back to default profiles: default
+08-05-2020 10:03:28.923 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStartupProfileInfo - No active profile set, falling back to default profiles: default
+2020-05-08 10:03:29.560  INFO 82320 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode!
+08-05-2020 10:03:29.560 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.multipleStoresDetected - Multiple Spring Data modules found, entering strict repository configuration mode!
+2020-05-08 10:03:29.561  INFO 82320 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data repositories in DEFAULT mode.
+08-05-2020 10:03:29.561 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Bootstrapping Spring Data repositories in DEFAULT mode.
+2020-05-08 10:03:29.647  INFO 82320 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 79ms. Found 4 repository interfaces.
+08-05-2020 10:03:29.647 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate.registerRepositoriesIn - Finished Spring Data repository scanning in 79ms. Found 4 repository interfaces.
+2020-05-08 10:03:30.092  INFO 82320 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$5a052de1] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:03:30.092 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration' of type [org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration$$EnhancerBySpringCGLIB$$5a052de1] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:03:30.099  INFO 82320 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:03:30.099 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'objectPostProcessor' of type [org.springframework.security.config.annotation.configuration.AutowireBeanFactoryObjectPostProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:03:30.101  INFO 82320 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@6ecab872' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:03:30.101 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler@6ecab872' of type [org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:03:30.105  INFO 82320 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$7ed9d093] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:03:30.105 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration' of type [org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration$$EnhancerBySpringCGLIB$$7ed9d093] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:03:30.109  INFO 82320 --- [main] trationDelegate$BeanPostProcessorChecker : Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+08-05-2020 10:03:30.109 [main] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker.postProcessAfterInitialization - Bean 'methodSecurityMetadataSource' of type [org.springframework.security.access.method.DelegatingMethodSecurityMetadataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+2020-05-08 10:03:30.472  INFO 82320 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 9004 (http)
+08-05-2020 10:03:30.472 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer.initialize - Tomcat initialized with port(s): 9004 (http)
+2020-05-08 10:03:30.496  INFO 82320 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+08-05-2020 10:03:30.496 [main] INFO  o.a.catalina.core.StandardService.log - Starting service [Tomcat]
+2020-05-08 10:03:30.496  INFO 82320 --- [main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.16]
+08-05-2020 10:03:30.496 [main] INFO  o.a.catalina.core.StandardEngine.log - Starting Servlet engine: [Apache Tomcat/9.0.16]
+2020-05-08 10:03:30.505  INFO 82320 --- [main] o.a.catalina.core.AprLifecycleListener   : The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/inm1/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+08-05-2020 10:03:30.505 [main] INFO  o.a.c.core.AprLifecycleListener.log - The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: [/Users/inm1/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:.]
+2020-05-08 10:03:31.284  INFO 82320 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+08-05-2020 10:03:31.284 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/].log - Initializing Spring embedded WebApplicationContext
+08-05-2020 10:03:31.284 [main] DEBUG o.s.web.context.ContextLoader.prepareWebApplicationContext - Published root WebApplicationContext as ServletContext attribute with name [org.springframework.web.context.WebApplicationContext.ROOT]
+08-05-2020 10:03:31.284 [main] INFO  o.s.web.context.ContextLoader.prepareWebApplicationContext - Root WebApplicationContext: initialization completed in 2334 ms
+2020-05-08 10:03:36.590  INFO 82320 --- [main] org.mongodb.driver.cluster               : Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+08-05-2020 10:03:36.590 [main] INFO  org.mongodb.driver.cluster.info - Cluster created with settings {hosts=[localhost:27017], mode=SINGLE, requiredClusterType=UNKNOWN, serverSelectionTimeout='30000 ms', maxWaitQueueSize=500}
+2020-05-08 10:03:36.659  INFO 82320 --- [cluster-ClusterId{value='5eb566b8505d1f41909df813', description='null'}-localhost:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:1, serverValue:101}] to localhost:27017
+08-05-2020 10:03:36.659 [cluster-ClusterId{value='5eb566b8505d1f41909df813', description='null'}-localhost:27017] INFO  org.mongodb.driver.connection.info - Opened connection [connectionId{localValue:1, serverValue:101}] to localhost:27017
+2020-05-08 10:03:36.665  INFO 82320 --- [cluster-ClusterId{value='5eb566b8505d1f41909df813', description='null'}-localhost:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[4, 0, 3]}, minWireVersion=0, maxWireVersion=7, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=2852400}
+08-05-2020 10:03:36.665 [cluster-ClusterId{value='5eb566b8505d1f41909df813', description='null'}-localhost:27017] INFO  org.mongodb.driver.cluster.info - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[4, 0, 3]}, minWireVersion=0, maxWireVersion=7, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=2852400}
+08-05-2020 10:03:36.982 [main] DEBUG o.s.w.f.CommonsRequestLoggingFilter.init - Filter 'requestLoggingFilter' configured for use
+2020-05-08 10:03:37.180  INFO 82320 --- [main] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:2, serverValue:102}] to localhost:27017
+08-05-2020 10:03:37.180 [main] INFO  org.mongodb.driver.connection.info - Opened connection [connectionId{localValue:2, serverValue:102}] to localhost:27017
+2020-05-08 10:03:37.300  INFO 82320 --- [main] ca.uhn.fhir.util.VersionUtil             : HAPI FHIR version 4.0.0 - Rev 5ddd6c87bb
+08-05-2020 10:03:37.300 [main] INFO  ca.uhn.fhir.util.VersionUtil.initialize - HAPI FHIR version 4.0.0 - Rev 5ddd6c87bb
+2020-05-08 10:03:37.304  INFO 82320 --- [main] ca.uhn.fhir.context.FhirContext          : Creating new FHIR context for FHIR version [R4]
+08-05-2020 10:03:37.304 [main] INFO  ca.uhn.fhir.context.FhirContext.<init> - Creating new FHIR context for FHIR version [R4]
+08-05-2020 10:03:37.740 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping.handlerMethodsInitialized - 17 mappings in 'requestMappingHandlerMapping'
+2020-05-08 10:03:37.844  INFO 82320 --- [main] pertySourcedRequestMappingHandlerMapping : Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+08-05-2020 10:03:37.844 [main] INFO  s.d.s.w.PropertySourcedRequestMappingHandlerMapping.initHandlerMethods - Mapped URL path [/v2/api-docs] onto method [public org.springframework.http.ResponseEntity<springfox.documentation.spring.web.json.Json> springfox.documentation.swagger2.web.Swagger2Controller.getDocumentation(java.lang.String,javax.servlet.http.HttpServletRequest)]
+2020-05-08 10:03:38.018  INFO 82320 --- [main] o.s.s.web.DefaultSecurityFilterChain     : Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@204d9edf, org.springframework.security.web.context.SecurityContextPersistenceFilter@4faf1f4, org.springframework.security.web.header.HeaderWriterFilter@19fbc594, org.springframework.security.web.authentication.logout.LogoutFilter@65600fb3, gov.nist.hit.vs.auth.config.JwtRequestFilter@2da99821, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7f2b584b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7f0d8eff, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6b2aafbc, org.springframework.security.web.session.SessionManagementFilter@34009349, org.springframework.security.web.access.ExceptionTranslationFilter@48f2054d, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@67d8faec]
+08-05-2020 10:03:38.018 [main] INFO  o.s.s.web.DefaultSecurityFilterChain.<init> - Creating filter chain: any request, [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@204d9edf, org.springframework.security.web.context.SecurityContextPersistenceFilter@4faf1f4, org.springframework.security.web.header.HeaderWriterFilter@19fbc594, org.springframework.security.web.authentication.logout.LogoutFilter@65600fb3, gov.nist.hit.vs.auth.config.JwtRequestFilter@2da99821, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7f2b584b, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@7f0d8eff, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@6b2aafbc, org.springframework.security.web.session.SessionManagementFilter@34009349, org.springframework.security.web.access.ExceptionTranslationFilter@48f2054d, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@67d8faec]
+08-05-2020 10:03:38.096 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping.registerHandlers - Patterns [/**/favicon.ico] in 'faviconHandlerMapping'
+2020-05-08 10:03:38.206  INFO 82320 --- [main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:03:38.206 [main] INFO  o.s.s.c.ThreadPoolTaskExecutor.initialize - Initializing ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:03:38.231 [main] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerAdapter.initControllerAdviceCache - ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+08-05-2020 10:03:38.273 [main] DEBUG o.s.w.s.h.SimpleUrlHandlerMapping.registerHandlers - Patterns [/webjars/**, /**] in 'resourceHandlerMapping'
+08-05-2020 10:03:38.281 [main] DEBUG o.s.w.s.m.m.a.ExceptionHandlerExceptionResolver.initExceptionHandlerAdviceCache - ControllerAdvice beans: 0 @ExceptionHandler, 1 ResponseBodyAdvice
+2020-05-08 10:03:38.311  WARN 82320 --- [main] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+08-05-2020 10:03:38.311 [main] WARN  o.s.b.a.t.ThymeleafAutoConfiguration$DefaultTemplateResolverConfiguration.checkTemplateLocationExists - Cannot find template location: classpath:/templates/ (please add some templates or check your Thymeleaf configuration)
+2020-05-08 10:03:38.469  INFO 82320 --- [main] o.s.s.c.ThreadPoolTaskScheduler          : Initializing ExecutorService 'taskScheduler'
+08-05-2020 10:03:38.469 [main] INFO  o.s.s.c.ThreadPoolTaskScheduler.initialize - Initializing ExecutorService 'taskScheduler'
+2020-05-08 10:03:38.520  INFO 82320 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Context refreshed
+08-05-2020 10:03:38.520 [main] INFO  s.d.s.w.p.DocumentationPluginsBootstrapper.start - Context refreshed
+2020-05-08 10:03:38.563  INFO 82320 --- [main] d.s.w.p.DocumentationPluginsBootstrapper : Found 1 custom documentation plugin(s)
+08-05-2020 10:03:38.563 [main] INFO  s.d.s.w.p.DocumentationPluginsBootstrapper.start - Found 1 custom documentation plugin(s)
+2020-05-08 10:03:38.611  INFO 82320 --- [main] s.d.s.w.s.ApiListingReferenceScanner     : Scanning for api listing references
+08-05-2020 10:03:38.611 [main] INFO  s.d.s.w.s.ApiListingReferenceScanner.scan - Scanning for api listing references
+2020-05-08 10:03:38.956  INFO 82320 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 9004 (http) with context path ''
+08-05-2020 10:03:38.956 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer.start - Tomcat started on port(s): 9004 (http) with context path ''
+2020-05-08 10:03:38.958  INFO 82320 --- [main] gov.nist.hit.vs.bootstrap.app.App        : Started App in 30.347 seconds (JVM running for 31.537)
+08-05-2020 10:03:38.958 [main] INFO  gov.nist.hit.vs.bootstrap.app.App.logStarted - Started App in 30.347 seconds (JVM running for 31.537)
+2020-05-08 10:03:39.416  INFO 82320 --- [http-nio-9004-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+08-05-2020 10:03:39.416 [http-nio-9004-exec-1] INFO  o.a.c.c.C.[Tomcat].[localhost].[/].log - Initializing Spring DispatcherServlet 'dispatcherServlet'
+08-05-2020 10:03:39.417 [http-nio-9004-exec-1] INFO  o.s.web.servlet.DispatcherServlet.initServletBean - Initializing Servlet 'dispatcherServlet'
+08-05-2020 10:03:39.417 [http-nio-9004-exec-1] DEBUG o.s.web.servlet.DispatcherServlet.initMultipartResolver - Detected StandardServletMultipartResolver
+08-05-2020 10:03:39.428 [http-nio-9004-exec-1] DEBUG o.s.web.servlet.DispatcherServlet.initServletBean - enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+08-05-2020 10:03:39.428 [http-nio-9004-exec-1] INFO  o.s.web.servlet.DispatcherServlet.initServletBean - Completed initialization in 11 ms
+08-05-2020 10:03:39.738 [http-nio-9004-exec-1] DEBUG o.s.w.f.CommonsRequestLoggingFilter.beforeRequest - Before request [uri=/upload/aphl;client=0:0:0:0:0:0:0:1;user=admin-nist;headers=[authorization:"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbi1uaXN0IiwiZXhwIjoxNTg4OTY0MDU1LCJpYXQiOjE1ODg5NDYwNTV9.A7IBIsUOwQ_ABNQ1J5fm96nMaDsWUQGZpvGConEiDlecQZyfvQm7nFs3KH03IGDqjYAuHknSZFCT50DQC0ZKfw", user-agent:"PostmanRuntime/7.23.0", accept:"*/*", cache-control:"no-cache", postman-token:"6af13dbb-419a-4e9d-8ed0-752dca78820a", host:"localhost:9004", accept-encoding:"gzip, deflate, br", content-length:"63369", connection:"keep-alive", Content-Type:"multipart/form-data;boundary=--------------------------782226291117901031839991;charset=UTF-8"]]
+08-05-2020 10:03:39.741 [http-nio-9004-exec-1] DEBUG o.s.web.servlet.DispatcherServlet.traceDebug - POST "/upload/aphl", parameters={}
+08-05-2020 10:03:39.749 [http-nio-9004-exec-1] DEBUG o.s.w.s.m.m.a.RequestMappingHandlerMapping.getHandler - Mapped to public java.lang.String gov.nist.hit.vs.valueset.controller.AphlController.singleFileUpload(org.springframework.web.multipart.MultipartFile,org.springframework.web.servlet.mvc.support.RedirectAttributes)
+08-05-2020 10:03:40.557 [http-nio-9004-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor.writeWithMessageConverters - Using 'application/json', given [*/*] and supported [application/json]
+08-05-2020 10:03:40.558 [http-nio-9004-exec-1] DEBUG o.s.w.s.m.m.a.RequestResponseBodyMethodProcessor.traceDebug - Writing ["Error in line: 805"]
+08-05-2020 10:03:40.562 [http-nio-9004-exec-1] DEBUG o.s.web.servlet.DispatcherServlet.logResult - Completed 200 OK
+08-05-2020 10:03:40.564 [http-nio-9004-exec-1] DEBUG o.s.w.f.CommonsRequestLoggingFilter.afterRequest - After request [uri=/upload/aphl;client=0:0:0:0:0:0:0:1;user=admin-nist;headers=[authorization:"Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbi1uaXN0IiwiZXhwIjoxNTg4OTY0MDU1LCJpYXQiOjE1ODg5NDYwNTV9.A7IBIsUOwQ_ABNQ1J5fm96nMaDsWUQGZpvGConEiDlecQZyfvQm7nFs3KH03IGDqjYAuHknSZFCT50DQC0ZKfw", user-agent:"PostmanRuntime/7.23.0", accept:"*/*", cache-control:"no-cache", postman-token:"6af13dbb-419a-4e9d-8ed0-752dca78820a", host:"localhost:9004", accept-encoding:"gzip, deflate, br", content-length:"63369", connection:"keep-alive", Content-Type:"multipart/form-data;boundary=--------------------------782226291117901031839991;charset=UTF-8"]]
+2020-05-08 10:04:20.403  INFO 82320 --- [Thread-3] o.s.s.c.ThreadPoolTaskScheduler          : Shutting down ExecutorService 'taskScheduler'
+08-05-2020 10:04:20.403 [Thread-3] INFO  o.s.s.c.ThreadPoolTaskScheduler.shutdown - Shutting down ExecutorService 'taskScheduler'
+2020-05-08 10:04:20.405  INFO 82320 --- [Thread-3] o.s.s.concurrent.ThreadPoolTaskExecutor  : Shutting down ExecutorService 'applicationTaskExecutor'
+08-05-2020 10:04:20.405 [Thread-3] INFO  o.s.s.c.ThreadPoolTaskExecutor.shutdown - Shutting down ExecutorService 'applicationTaskExecutor'

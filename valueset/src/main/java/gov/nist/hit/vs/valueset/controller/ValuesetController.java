@@ -59,7 +59,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getValuesets(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format)
 			throws IOException {
 		String result = valuesetService.getLatestValuesets(source, _format);
@@ -68,7 +68,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getValuesetById(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@ApiParam(example = "MVX") @PathVariable String id,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -78,7 +78,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}/$meta", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getValuesetMetaById(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -88,7 +88,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}/$expand", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getExpandedValueset(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -98,7 +98,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}/$validate-code", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String validateCode(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id, @RequestParam String code, @RequestParam(required = false) String system,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format)
 			throws IOException {
@@ -109,7 +109,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}/_history/{vid}", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getValuesetByVersion(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id, @PathVariable String vid,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -119,7 +119,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 
 	@RequestMapping(value = "/{id}/_history/{vid}/$meta", method = RequestMethod.GET, produces = { "application/json" })
 	public @ResponseBody String getValuesetMetaByVersion(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id, @PathVariable String vid,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -130,7 +130,7 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 	@RequestMapping(value = "/{id}/_history/{vid}/$expand", method = RequestMethod.GET, produces = {
 			"application/json" })
 	public @ResponseBody String getExpandedValuesetByVersion(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
 			@PathVariable String id, @PathVariable String vid,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format,
 			@RequestParam(required = false) String name) throws IOException {
@@ -141,8 +141,9 @@ public class ValuesetController extends JpaResourceProviderR4<ValueSet> {
 	@RequestMapping(value = "/{id}/_history/{vid}/$validate-code", method = RequestMethod.GET, produces = {
 			"application/json" })
 	public @ResponseBody String validateCodeByVersion(
-			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads") @PathVariable String source,
-			@PathVariable String id, @PathVariable String vid, @RequestParam String code, @RequestParam String system,
+			@ApiParam(example = "cdc", allowableValues = "cdc, phinvads, hl7") @PathVariable String source,
+			@PathVariable String id, @PathVariable String vid, @RequestParam String code,
+			@RequestParam(required = false) String system,
 			@ApiParam(example = "json", allowableValues = "json, xml") @RequestParam(required = false) String _format)
 			throws IOException {
 

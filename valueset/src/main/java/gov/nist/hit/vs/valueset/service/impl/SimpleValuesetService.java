@@ -4,15 +4,18 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.hl7.fhir.r4.model.BooleanType;
 import org.hl7.fhir.r4.model.Bundle;
+import org.hl7.fhir.r4.model.Extension;
 import org.hl7.fhir.r4.model.Meta;
 import org.hl7.fhir.r4.model.OperationOutcome;
 import org.hl7.fhir.r4.model.Parameters;
+import org.hl7.fhir.r4.model.PositiveIntType;
 import org.hl7.fhir.r4.model.StringType;
 import org.hl7.fhir.r4.model.OperationOutcome.IssueSeverity;
 import org.hl7.fhir.r4.model.UriType;
@@ -35,10 +38,12 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import gov.nist.healthcare.vcsms.service.impl.NISTVCSMSClientImpl;
+import gov.nist.hit.vs.valueset.domain.AphlValueset;
 import gov.nist.hit.vs.valueset.domain.CDCCode;
 import gov.nist.hit.vs.valueset.domain.CDCValueset;
 import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 import gov.nist.hit.vs.valueset.domain.Code;
+import gov.nist.hit.vs.valueset.domain.Hl7Valueset;
 import gov.nist.hit.vs.valueset.domain.PhinvadsValueset;
 import gov.nist.hit.vs.valueset.repository.CDCValusetMetadataRepository;
 import gov.nist.hit.vs.valueset.repository.CDCValusetRepository;
@@ -95,29 +100,49 @@ public class SimpleValuesetService implements ValuesetService {
 
 	@Override
 	public String getLatestValuesets(String source, String format) throws IOException {
-		switch (source) {
-		case "fhir":
+
+		if (source.equalsIgnoreCase("fhir")) {
 			return null;
-		case "phinvads":
+		} else if (source.equalsIgnoreCase("phinvads")) {
 			return getLatestPhinvadsValuesets(format);
-		case "cdc":
+		} else if (source.equalsIgnoreCase("cdc")) {
 			return getLatestCDCValuesets(format);
+		} else if (source.toLowerCase().startsWith("aphl")) {
+			String[] vsInfo = source.toLowerCase().split("_");
+			if (!vsInfo[1].isEmpty()) {
+				return getLatestAphlValuesets(vsInfo[1].toLowerCase(), format);
+			} else {
+				return null;
+			}
+		} else if (source.equalsIgnoreCase("hl7")) {
+			return getLatestHL7Valuesets(format);
+		} else {
+			return null;
 		}
-		return null;
 	}
 
 	@Override
 	public String getValueset(String source, String theValueSetIdentifier, String vid, String format, Boolean meta,
 			Boolean expand) throws IOException {
-		switch (source) {
-		case "fhir":
+
+		if (source.equalsIgnoreCase("fhir")) {
 			return getFhirValueset(theValueSetIdentifier, format, meta, expand);
-		case "phinvads":
+		} else if (source.equalsIgnoreCase("phinvads")) {
 			return getPhinvadsValueset(theValueSetIdentifier, format, vid, meta, expand);
-		case "cdc":
+		} else if (source.equalsIgnoreCase("cdc")) {
 			return getCDCValueset(theValueSetIdentifier, format, vid, meta, expand);
+		} else if (source.toLowerCase().startsWith("aphl")) {
+			String[] vsInfo = source.toLowerCase().split("_");
+			if (!vsInfo[1].isEmpty()) {
+				return getAphlValueset(vsInfo[1].toLowerCase(), theValueSetIdentifier, format, vid, meta, expand);
+			} else {
+				return null;
+			}
+		} else if (source.equalsIgnoreCase("hl7")) {
+			return getHl7Valueset(theValueSetIdentifier, format, vid, meta, expand);
+		} else {
+			return null;
 		}
-		return null;
 
 	}
 
@@ -129,15 +154,25 @@ public class SimpleValuesetService implements ValuesetService {
 		if (!haveCode) {
 			throw new InvalidRequestException("No code provided to validate");
 		}
-		switch (source) {
-		case "fhir":
+
+		if (source.equalsIgnoreCase("fhir")) {
 			return validateFhirCode(theValueSetIdentifier, theCode, theSystem, format);
-		case "phinvads":
+		} else if (source.equalsIgnoreCase("phinvads")) {
 			return validatePhinvadsCode(theValueSetIdentifier, vid, theCode, theSystem, format);
-		case "cdc":
+		} else if (source.equalsIgnoreCase("cdc")) {
 			return validateCDCCode(theValueSetIdentifier, vid, theCode, theSystem, format);
+		} else if (source.toLowerCase().startsWith("aphl")) {
+			String[] vsInfo = source.toLowerCase().split("_");
+			if (!vsInfo[1].isEmpty()) {
+				return validateAphlCode(vsInfo[1].toLowerCase(), theValueSetIdentifier, vid, theCode, theSystem,
+						format);
+			} else {
+				return null;
+			}
+		} else {
+			return null;
 		}
-		return null;
+
 	}
 
 	public String getLatestCDCValuesets(String format) throws IOException {
@@ -171,6 +206,39 @@ public class SimpleValuesetService implements ValuesetService {
 
 	}
 
+	public String getLatestHL7Valuesets(String format) throws IOException {
+
+		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
+				: fhirR4Context.newJsonParser();
+		parser.setPrettyPrint(true);
+
+		// Query to get all valuesets with the latest version for each one
+		Aggregation aggregation = newAggregation(Hl7Valueset.class,
+				sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+				group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+		AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
+				Hl7Valueset.class);
+		List<Hl7Valueset> valuesets = result.getMappedResults();
+
+		Bundle bundle = new Bundle();
+		if (valuesets != null && valuesets.size() > 0) {
+			bundle.setTotal(valuesets.size());
+			for (Hl7Valueset vs : valuesets) {
+				ValueSet fhirVs = convertHl7ToFhir(vs, false);
+
+				bundle.addEntry().setResource(fhirVs);
+			}
+			String encoded = parser.encodeResourceToString(bundle);
+			return encoded;
+		} else {
+			OperationOutcome oo = new OperationOutcome();
+			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+			String encoded = parser.encodeResourceToString(oo);
+			return encoded;
+		}
+
+	}
+
 	public String getLatestPhinvadsValuesets(String format) throws IOException {
 
 		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
@@ -190,6 +258,39 @@ public class SimpleValuesetService implements ValuesetService {
 			bundle.setTotal(valuesets.size());
 			for (PhinvadsValueset vs : valuesets) {
 				ValueSet fhirVs = convertPhinvadsToFhir(vs, false);
+
+				bundle.addEntry().setResource(fhirVs);
+			}
+			String encoded = parser.encodeResourceToString(bundle);
+			return encoded;
+		} else {
+			OperationOutcome oo = new OperationOutcome();
+			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+			String encoded = parser.encodeResourceToString(oo);
+			return encoded;
+		}
+
+	}
+
+	public String getLatestAphlValuesets(String program, String format) throws IOException {
+
+		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
+				: fhirR4Context.newJsonParser();
+		parser.setPrettyPrint(true);
+
+		// Query to get all valuesets with the latest version for each one
+		Aggregation aggregation = newAggregation(AphlValueset.class, match(Criteria.where("program").is(program)),
+				sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+				group("name", "program").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+		AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
+				AphlValueset.class);
+		List<AphlValueset> valuesets = result.getMappedResults();
+
+		Bundle bundle = new Bundle();
+		if (valuesets != null && valuesets.size() > 0) {
+			bundle.setTotal(valuesets.size());
+			for (AphlValueset vs : valuesets) {
+				ValueSet fhirVs = convertAphlToFhir(vs, false);
 
 				bundle.addEntry().setResource(fhirVs);
 			}
@@ -318,6 +419,115 @@ public class SimpleValuesetService implements ValuesetService {
 		}
 
 	}
+	
+	public String getHl7Valueset(String theValueSetIdentifier, String format, String vid, Boolean meta,
+			Boolean expand) throws IOException {
+
+		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
+				: fhirR4Context.newJsonParser();
+		parser.setPrettyPrint(true);
+
+		Hl7Valueset vs = null;
+
+		if (vid != null) {
+			int version = Integer.parseInt(vid);
+			Aggregation aggregation = newAggregation(Hl7Valueset.class,
+					match(Criteria.where("name").is(theValueSetIdentifier)
+							.andOperator(Criteria.where("version").is(version))),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
+					Hl7Valueset.class);
+			vs = result.getUniqueMappedResult();
+
+		} else {
+			Aggregation aggregation = newAggregation(Hl7Valueset.class,
+					match(Criteria.where("name").is(theValueSetIdentifier)),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+			AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
+					Hl7Valueset.class);
+			vs = result.getUniqueMappedResult();
+		}
+		if (vs != null) {
+			System.out.println("Successfully got the metadata from Hl7 web service for " + theValueSetIdentifier);
+			ValueSet fhirVs = convertHl7ToFhir(vs, expand);
+			if (meta) {
+				Meta m = fhirVs.getMeta();
+				Parameters parameters = new Parameters();
+				parameters.addParameter().setName("return").setValue(m);
+				String encoded = parser.encodeResourceToString(parameters);
+				return encoded;
+			}
+
+			String encoded = parser.encodeResourceToString(fhirVs);
+			return encoded;
+		} else {
+			System.out.println("Failed to get the metadata from PHINVADS web service for " + theValueSetIdentifier);
+			OperationOutcome oo = new OperationOutcome();
+			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+			String encoded = parser.encodeResourceToString(oo);
+			return encoded;
+		}
+
+	}
+
+	public String getAphlValueset(String program, String theValueSetIdentifier, String format, String vid, Boolean meta,
+			Boolean expand) throws IOException {
+
+		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
+				: fhirR4Context.newJsonParser();
+		parser.setPrettyPrint(true);
+
+		AphlValueset vs = null;
+
+		if (vid != null) {
+			int version = Integer.parseInt(vid);
+			Aggregation aggregation = newAggregation(AphlValueset.class,
+					match(Criteria.where("program").is(program)
+							.andOperator(Criteria.where("name").is(theValueSetIdentifier))
+							.andOperator(Criteria.where("version").is(version))),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
+					replaceRoot("$doc"));
+			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
+					AphlValueset.class);
+			vs = result.getUniqueMappedResult();
+
+		} else {
+			Aggregation aggregation = newAggregation(AphlValueset.class,
+					match(Criteria.where("program").is(program)
+							.andOperator(Criteria.where("name").is(theValueSetIdentifier))),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
+					replaceRoot("$doc"));
+			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
+					AphlValueset.class);
+			vs = result.getUniqueMappedResult();
+		}
+		if (vs != null) {
+			System.out.println("Successfully got the metadata from PHINVADS web service for " + theValueSetIdentifier);
+			System.out.println(theValueSetIdentifier + " last updated date is " + vs.getUpdateDate().toString());
+			ValueSet fhirVs = convertAphlToFhir(vs, expand);
+			if (meta) {
+				Meta m = fhirVs.getMeta();
+				Parameters parameters = new Parameters();
+				parameters.addParameter().setName("return").setValue(m);
+				String encoded = parser.encodeResourceToString(parameters);
+				return encoded;
+			}
+
+			String encoded = parser.encodeResourceToString(fhirVs);
+			return encoded;
+		} else {
+			System.out.println("Failed to get the metadata from APHL web service for " + theValueSetIdentifier);
+			OperationOutcome oo = new OperationOutcome();
+			oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Not Found");
+			String encoded = parser.encodeResourceToString(oo);
+			return encoded;
+		}
+
+	}
 
 	public ValueSet convertPhinvadsToFhir(PhinvadsValueset vs, Boolean expand) {
 		ValueSet fhirVs = new ValueSet();
@@ -342,6 +552,8 @@ public class SimpleValuesetService implements ValuesetService {
 		fhirVs.setUrl(phinvadsUrl.concat(vs.getOid()));
 		fhirVs.setExpansion(vsExpansion);
 		fhirVs.setVersion(String.valueOf(vs.getVersion()));
+		Extension ext = new Extension("numberOfCodes", new PositiveIntType(vs.getNumberOfCodes()));
+		fhirVs.getExtension().add(ext);
 		return fhirVs;
 	}
 
@@ -364,6 +576,76 @@ public class SimpleValuesetService implements ValuesetService {
 		fhirVs.setTitle(vs.getMetadata().getTitle());
 		fhirVs.setVersion(String.valueOf(vs.getVersion()));
 		fhirVs.setExpansion(vsExpansion);
+		Extension ext = new Extension("numberOfCodes", new PositiveIntType(vs.getCdcCodes().size()));
+		fhirVs.getExtension().add(ext);
+		return fhirVs;
+	}
+
+	public ValueSet convertAphlToFhir(AphlValueset vs, Boolean expand) {
+		ValueSet fhirVs = new ValueSet();
+		ValueSetExpansionComponent vsExpansion = new ValueSetExpansionComponent();
+		if (expand) {
+			vsExpansion.setTotal(vs.getCodes().size());
+			for (Code code : vs.getCodes()) {
+				ValueSetExpansionContainsComponent contain = new ValueSetExpansionContainsComponent();
+				contain.setCode(code.getValue());
+				contain.setSystem(code.getCodeSystem());
+				vsExpansion.addContains(contain);
+			}
+		}
+
+		fhirVs.setName(vs.getName());
+		fhirVs.setId(vs.getName());
+		fhirVs.setVersion(String.valueOf(vs.getVersion()));
+		fhirVs.setExpansion(vsExpansion);
+		Extension ext = new Extension("numberOfCodes", new PositiveIntType(vs.getCodes().size()));
+		fhirVs.getExtension().add(ext);
+		return fhirVs;
+	}
+
+	public ValueSet convertHl7ToFhir(Hl7Valueset vs, Boolean expand) {
+		ValueSet fhirVs = new ValueSet();
+		ValueSetExpansionComponent vsExpansion = new ValueSetExpansionComponent();
+		if (expand) {
+
+			vsExpansion.setTotal(vs.getCodes().size());
+			for (Code code : vs.getCodes()) {
+				ValueSetExpansionContainsComponent contain = new ValueSetExpansionContainsComponent();
+				contain.setCode(code.getValue());
+				contain.setDisplay(code.getDisplay());
+				contain.setSystem(code.getCodeSystem());
+
+				Extension defExt = new Extension("definition", new StringType(code.getDefinition()));
+				Extension statusExt = new Extension("v2TableStatus", new StringType(code.getV2TableStatus()));
+				Extension depExt = new Extension("deprecated", new StringType(code.getDeprecated()));
+				Extension conceptComExt = new Extension("v2ConceptComment", new StringType(code.getV2ConceptComment()));
+				Extension conceptComPExt = new Extension("v2ConceptCommentAsPublished",
+						new StringType(code.getV2ConceptCommentAsPublished()));
+				Extension typeExt = new Extension("codeType", new StringType(code.getCodeType()));
+				Extension regexExt = new Extension("regexRule", new StringType(code.getRegexRule()));
+				Extension excludeExt = new Extension("exclude", new BooleanType(code.isExclude()));
+				Extension commentsExt = new Extension("comments", new StringType(code.getComments()));
+
+				contain.getExtension().add(defExt);
+				contain.getExtension().add(statusExt);
+				contain.getExtension().add(depExt);
+				contain.getExtension().add(conceptComExt);
+				contain.getExtension().add(conceptComPExt);
+				contain.getExtension().add(typeExt);
+				contain.getExtension().add(regexExt);
+				contain.getExtension().add(excludeExt);
+				contain.getExtension().add(commentsExt);
+
+				vsExpansion.addContains(contain);
+			}
+
+		}
+		fhirVs.setName(vs.getName());
+		fhirVs.setId(vs.getName());
+		fhirVs.setExpansion(vsExpansion);
+		fhirVs.setVersion(vs.getHl7Version());
+		Extension ext = new Extension("numberOfCodes", new PositiveIntType(vs.getNumberOfCodes()));
+		fhirVs.getExtension().add(ext);
 		return fhirVs;
 	}
 
@@ -433,22 +715,26 @@ public class SimpleValuesetService implements ValuesetService {
 				cdcValueset = result.getUniqueMappedResult();
 			}
 			if (cdcValueset != null) {
-				List<CDCCode> codes = cdcValueset.getCdcCodes();
-				CDCCode codeFound = codes.stream().filter(c -> c.getCode().toLowerCase().equals(theCode.toLowerCase())
-						&& c.getSystem().toLowerCase().equals(theSystem.toLowerCase())).findAny().orElse(null);
 				Parameters retVal = new Parameters();
-				retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+				List<CDCCode> codesFound = cdcValueset.getCdcCodes().stream()
+						.filter(c -> c.getCode().toLowerCase().equals(theCode.toLowerCase()))
+						.collect(Collectors.toList());
+				if (theSystem == null || theSystem.isEmpty()) {
+					retVal.addParameter().setName("result").setValue(new BooleanType(codesFound.size() > 0));
+				} else {
+					CDCCode codeFound = cdcValueset.getCdcCodes().stream()
+							.filter(c -> c.getCode().toLowerCase().equals(theCode.toLowerCase())
+									&& c.getSystem().toLowerCase().equals(theSystem.toLowerCase()))
+							.findAny().orElse(null);
+					retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+				}
+				for (CDCCode code : codesFound) {
+					retVal.addParameter().setName("codeSystem").setValue(new StringType(code.getSystem()));
+				}
+
 				String encoded = parser.encodeResourceToString(retVal);
 				return encoded;
 			}
-		}
-
-		String r = null;
-		if (cdcValueset != null) {
-			if (r != null) {
-				return r;
-			}
-
 		}
 
 		OperationOutcome oo = new OperationOutcome();
@@ -523,11 +809,23 @@ public class SimpleValuesetService implements ValuesetService {
 				}
 			} else {
 				Set<Code> codes = vs.getCodes();
-				Code codeFound = codes.stream()
-						.filter(c -> c.getValue().equals(theCode) && c.getCodeSystem().equals(theSystem)).findAny()
-						.orElse(null);
 				Parameters retVal = new Parameters();
-				retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+//				Code codeFound = codes.stream()
+//						.filter(c -> c.getValue().equals(theCode) && c.getCodeSystem().equals(theSystem)).findAny()
+//						.orElse(null);
+				List<Code> codesFound = codes.stream().filter(c -> c.getValue().equals(theCode))
+						.collect(Collectors.toList());
+				if (theSystem == null || theSystem.isEmpty()) {
+					retVal.addParameter().setName("result").setValue(new BooleanType(codesFound.size() > 0));
+				} else {
+					Code codeFound = codes.stream()
+							.filter(c -> c.getValue().equals(theCode) && c.getCodeSystem().equals(theSystem)).findAny()
+							.orElse(null);
+					retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+				}
+				for (Code code : codesFound) {
+					retVal.addParameter().setName("codeSystem").setValue(new StringType(code.getCodeSystem()));
+				}
 				String encoded = parser.encodeResourceToString(retVal);
 				return encoded;
 			}
@@ -578,6 +876,65 @@ public class SimpleValuesetService implements ValuesetService {
 			String encoded = parser.encodeResourceToString(oo);
 			return encoded;
 		}
+	}
+
+	public String validateAphlCode(String program, String theValueSetIdentifier, String vid, String theCode,
+			String theSystem, String format) throws IOException {
+
+		IParser parser = (format != null && format.equals("xml")) ? fhirR4Context.newXmlParser()
+				: fhirR4Context.newJsonParser();
+
+		AphlValueset vs = null;
+		if (vid != null) {
+			int version = Integer.parseInt(vid);
+			Aggregation aggregation = newAggregation(AphlValueset.class,
+					match(Criteria.where("program").is(program)
+							.andOperator(Criteria.where("name").is(theValueSetIdentifier))
+							.andOperator(Criteria.where("version").is(version))),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
+					replaceRoot("$doc"));
+			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
+					AphlValueset.class);
+			vs = result.getUniqueMappedResult();
+
+		} else {
+			Aggregation aggregation = newAggregation(AphlValueset.class,
+					match(Criteria.where("program").is(program)
+							.andOperator(Criteria.where("name").is(theValueSetIdentifier))),
+					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
+					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
+					replaceRoot("$doc"));
+			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
+					AphlValueset.class);
+			vs = result.getUniqueMappedResult();
+		}
+		if (vs != null) {
+
+			Set<Code> codes = vs.getCodes();
+			Parameters retVal = new Parameters();
+			List<Code> codesFound = codes.stream().filter(c -> c.getValue().equals(theCode))
+					.collect(Collectors.toList());
+			if (theSystem == null || theSystem.isEmpty()) {
+				retVal.addParameter().setName("result").setValue(new BooleanType(codesFound.size() > 0));
+			} else {
+				Code codeFound = codes.stream()
+						.filter(c -> c.getValue().equals(theCode) && c.getCodeSystem().equals(theSystem)).findAny()
+						.orElse(null);
+				retVal.addParameter().setName("result").setValue(new BooleanType(codeFound != null));
+			}
+			for (Code code : codesFound) {
+				retVal.addParameter().setName("codeSystem").setValue(new StringType(code.getCodeSystem()));
+			}
+			String encoded = parser.encodeResourceToString(retVal);
+			return encoded;
+
+		}
+
+		OperationOutcome oo = new OperationOutcome();
+		oo.addIssue().setSeverity(IssueSeverity.ERROR).setDiagnostics("Value set not found");
+		String encoded = parser.encodeResourceToString(oo);
+		return encoded;
 	}
 
 	public Parameters validateCodeIsInContains(List<ValueSetExpansionContainsComponent> contains, String theCode,
