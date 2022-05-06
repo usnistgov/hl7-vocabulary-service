@@ -2,12 +2,19 @@ package gov.nist.hit.vs.bootstrap.util;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +42,9 @@ import gov.cdc.vocab.service.dto.output.ValueSetResultDto;
 import gov.nist.hit.vs.valueset.domain.CDCValuesetMetadata;
 import gov.nist.hit.vs.valueset.domain.Code;
 import gov.nist.hit.vs.valueset.domain.PhinvadsValueset;
+import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 
 @Component
 public class PhinvadsScheduler {
@@ -49,11 +59,30 @@ public class PhinvadsScheduler {
 
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-	public PhinvadsScheduler() {
+	public PhinvadsScheduler() throws NoSuchAlgorithmException, KeyManagementException {
 		String serviceUrl = "https://phinvads.cdc.gov/vocabService/v2";
+		 /* Start of Fix */
+        TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() { return null; }
+            public void checkClientTrusted(X509Certificate[] certs, String authType) { }
+            public void checkServerTrusted(X509Certificate[] certs, String authType) { }
 
+        } };
+
+     
 		HessianProxyFactory factory = new HessianProxyFactory();
 		try {
+			   SSLContext sc = SSLContext.getInstance("SSL");
+		        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+		        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+		        // Create all-trusting host name verifier
+		        HostnameVerifier allHostsValid = new HostnameVerifier() {
+		            public boolean verify(String hostname, SSLSession session) { return true; }
+		        };
+		        // Install the all-trusting host verifier
+		        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		        /* End of the fix*/
 			setService((VocabService) factory.create(VocabService.class, serviceUrl));
 //			mongoOps = new MongoTemplate(new SimpleMongoDbFactory(new MongoClient(), "vocabulary-service"));
 		} catch (MalformedURLException e) {
@@ -64,7 +93,7 @@ public class PhinvadsScheduler {
 	@PostConstruct
 	public void initPhinvads() throws IOException {
 		System.out.println("************ INIT PHINVADS VALUESET METADATA1");
-//		reportCurrentTime();
+		reportCurrentTime();
 	}
 
 	// Every 1:00 AM Saturday
@@ -164,7 +193,7 @@ public class PhinvadsScheduler {
 		// 4. if updated, get full codes from PHINVADs web service
 		if (needUpdate) {
 			if (vscByVSVid == null)
-				vscByVSVid = this.getService().getValueSetConceptsByValueSetVersionId(vsv.getId(), 1, 100000);
+				vscByVSVid = this.getService().getValueSetConceptsByValueSetVersionId(vsv.getId(), 1, 10000);
 			if (valueSetConcepts == null)
 				valueSetConcepts = vscByVSVid.getValueSetConcepts();
 //			if (table == null)

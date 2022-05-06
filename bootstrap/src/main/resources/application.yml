@@ -7,7 +7,7 @@ db:
   name: vocabulary-service
   port: 27017
   host: vocabulary-service-db
-  #host: localhost
+#  host: localhost
 server:
   port : 9004
   

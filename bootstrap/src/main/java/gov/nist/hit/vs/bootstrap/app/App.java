@@ -91,7 +91,7 @@ public class App implements CommandLineRunner {
 		return new Docket(DocumentationType.SWAGGER_2).pathProvider(new RelativePathProvider(servletContext) {
 			@Override
 			public String getApplicationBasePath() {
-				return ":8095/vocabulary-service";
+				return "/vocabulary-service";
 			}
 		}).select().apis(RequestHandlerSelectors.any()).paths(PathSelectors.any()).build();
 	}

@@ -27,9 +27,11 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -37,6 +39,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import gov.nist.hit.vs.valueset.domain.Code;
 import gov.nist.hit.vs.valueset.service.Hl7Service;
 import gov.nist.hit.vs.valueset.service.ValuesetService;
+import io.swagger.annotations.ApiParam;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
@@ -47,6 +50,13 @@ public class Hl7Controller {
 
 	@Autowired
 	ValuesetService valuesetService;
+	
+	@ApiIgnore
+	@RequestMapping(value = "", method = RequestMethod.GET, produces = { "application/json" })
+	public @ResponseBody String get()
+			throws IOException {
+		return "";
+	}
 
 	@ApiIgnore
 	@RequestMapping(value = "/upload/hl7", method = RequestMethod.POST, produces = { "application/json" })
@@ -55,7 +65,7 @@ public class Hl7Controller {
 			redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
 			return "redirect:uploadStatus";
 		}
-
+		int uploads = 0;
 		try {
 			// Get the file and save it somewhere
 			byte[] bytes = file.getBytes();
@@ -64,46 +74,51 @@ public class Hl7Controller {
 
 			FileInputStream excelFile = new FileInputStream(new File(file.getOriginalFilename()));
 			Workbook workbook = new XSSFWorkbook(excelFile);
-			Sheet tableSheet = workbook.getSheet("HL70396");
-			if (tableSheet != null) {
-				Set<Code> codes = new HashSet<Code>();
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet tableSheet = workbook.getSheetAt(i);
+				// Process your sheet here.
+				if (tableSheet != null) {
+					Set<Code> codes = new HashSet<Code>();
 
-				Iterator<Row> iterator = tableSheet.iterator();
-				int i = 1;
-				while (iterator.hasNext()) {
-					if (i == 1) {
-						Row currentRow = iterator.next();
-//						if (!currentRow.getCell(0).getStringCellValue().equals("Value Set Name")
-//								|| !currentRow.getCell(1).getStringCellValue().equals("Code")
-//								|| !currentRow.getCell(2).getStringCellValue().equals("CodeSystem")) {
-//							return "Invalid header";
-//						}
-					} else {
-						Row currentRow = iterator.next();
-						Code c = new Code();
-						c.setValue(extractStringFromCell(currentRow, 0));
-						c.setDisplay(extractStringFromCell(currentRow, 1));
-						c.setDefinition(extractStringFromCell(currentRow, 2));
-						c.setV2TableStatus(extractStringFromCell(currentRow, 3));
-						c.setDeprecated(String.valueOf(extractNumberFromCell(currentRow, 4)));
-						c.setV2ConceptComment(extractStringFromCell(currentRow, 5));
-						c.setV2ConceptCommentAsPublished(extractStringFromCell(currentRow, 6));
-						c.setCodeSystem(extractStringFromCell(currentRow, 7));
-						c.setCodeType(extractStringFromCell(currentRow, 8));
-						c.setRegexRule(extractStringFromCell(currentRow, 9));
-						c.setComments(extractStringFromCell(currentRow, 10));
-						c.setExclude(extractStringFromCell(currentRow, 11) == null ? false
-								: extractStringFromCell(currentRow, 11).equals("exclude"));
-						codes.add(c);
+					Iterator<Row> iterator = tableSheet.iterator();
+					int j = 1;
+					while (iterator.hasNext()) {
+						if (j == 1) {
+							Row currentRow = iterator.next();
+//							if (!currentRow.getCell(0).getStringCellValue().equals("Value Set Name")
+//									|| !currentRow.getCell(1).getStringCellValue().equals("Code")
+//									|| !currentRow.getCell(2).getStringCellValue().equals("CodeSystem")) {
+//								return "Invalid header";
+//							}
+						} else {
+							Row currentRow = iterator.next();
+							Code c = new Code();
+							c.setValue(extractStringFromCell(currentRow, 0));
+							c.setDisplay(extractStringFromCell(currentRow, 1));
+							c.setDefinition(extractStringFromCell(currentRow, 2));
+							c.setV2TableStatus(extractStringFromCell(currentRow, 3));
+							System.out.println(j);
+							c.setDeprecated(String.valueOf(extractNumberFromCell(currentRow, 4)));
+							c.setV2ConceptComment(extractStringFromCell(currentRow, 5));
+							c.setV2ConceptCommentAsPublished(extractStringFromCell(currentRow, 6));
+							c.setCodeSystem(extractStringFromCell(currentRow, 7));
+							c.setCodeType(extractStringFromCell(currentRow, 8));
+							c.setRegexRule(extractStringFromCell(currentRow, 9));
+							c.setComments(extractStringFromCell(currentRow, 10));
+							c.setExclude(extractStringFromCell(currentRow, 11) == null ? false
+									: extractStringFromCell(currentRow, 11).equals("exclude"));
+							codes.add(c);
+						}
+						j++;
 					}
-					i++;
+					Files.deleteIfExists(path);
+					hl7Service.saveTable(tableSheet.getSheetName(), "2.x", codes);
+					
+					uploads++;
 				}
-				Files.deleteIfExists(path);
-				System.out.println("Done");
-				hl7Service.saveTable("HL70396", "2.x", codes);
-				return "Upload success. ";
 			}
-			return "Invalid file";
+//			Sheet tableSheet = workbook.getSheet("HL70396");
+			return "Upload success: " + uploads + " Value set(s) uploaded";
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			return "File not found";

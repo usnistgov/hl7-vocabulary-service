@@ -59,7 +59,7 @@ public class AphlServiceImpl implements AphlService {
 			if (vs != null) {
 				// Compare vs and map[key]. If there's a difference, create a new version of the
 				// vs and save it
-				if (key.equals("(Non-coded text)")) {
+				if (key.equals(vs.getName()) && program.equals(vs.getProgram())) {
 					Set<Code> addedCodes = this.difference(map.get(key), vs.getCodes());
 					Set<Code> removedCodes = this.difference(vs.getCodes(), map.get(key));
 					if (addedCodes.size() > 0 || removedCodes.size() > 0) {
