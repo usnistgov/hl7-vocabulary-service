@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -97,6 +98,8 @@ public class SimpleValuesetService implements ValuesetService {
 
 	@Autowired
 	MongoTemplate mongoTemplate;
+	
+	AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).build();
 
 	@Override
 	public String getLatestValuesets(String source, String format) throws IOException {
@@ -183,7 +186,7 @@ public class SimpleValuesetService implements ValuesetService {
 		// Query to get all valuesets with the latest version for each one
 		Aggregation aggregation = newAggregation(CDCValueset.class,
 				sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
-				group("metadata").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+				group("metadata").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 		AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
 				CDCValueset.class);
 		List<CDCValueset> cdcValuesets = result.getMappedResults();
@@ -215,7 +218,7 @@ public class SimpleValuesetService implements ValuesetService {
 		// Query to get all valuesets with the latest version for each one
 		Aggregation aggregation = newAggregation(Hl7Valueset.class,
 				sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
-				group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+				group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 		AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
 				Hl7Valueset.class);
 		List<Hl7Valueset> valuesets = result.getMappedResults();
@@ -248,7 +251,7 @@ public class SimpleValuesetService implements ValuesetService {
 		// Query to get all valuesets with the latest version for each one
 		Aggregation aggregation = newAggregation(PhinvadsValueset.class,
 				sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
-				group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+				group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 		AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
 				PhinvadsValueset.class);
 		List<PhinvadsValueset> valuesets = result.getMappedResults();
@@ -281,7 +284,7 @@ public class SimpleValuesetService implements ValuesetService {
 		// Query to get all valuesets with the latest version for each one
 		Aggregation aggregation = newAggregation(AphlValueset.class, match(Criteria.where("program").is(program)),
 				sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
-				group("name", "program").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+				group("name", "program").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 		AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 				AphlValueset.class);
 		List<AphlValueset> valuesets = result.getMappedResults();
@@ -323,7 +326,7 @@ public class SimpleValuesetService implements ValuesetService {
 								.andOperator(Criteria.where("version").is(version))),
 						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
 						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
-						replaceRoot("$doc"));
+						replaceRoot("$doc")).withOptions(options);
 				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
 						CDCValueset.class);
 				cdcValueset = result.getUniqueMappedResult();
@@ -333,7 +336,7 @@ public class SimpleValuesetService implements ValuesetService {
 						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))),
 						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
 						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
-						replaceRoot("$doc"));
+						replaceRoot("$doc")).withOptions(options);
 				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
 						CDCValueset.class);
 				cdcValueset = result.getUniqueMappedResult();
@@ -382,7 +385,7 @@ public class SimpleValuesetService implements ValuesetService {
 					match(Criteria.where("oid").is(theValueSetIdentifier)
 							.andOperator(Criteria.where("version").is(version))),
 					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
-					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
 					PhinvadsValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -391,7 +394,7 @@ public class SimpleValuesetService implements ValuesetService {
 			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
 					match(Criteria.where("oid").is(theValueSetIdentifier)),
 					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
-					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
 					PhinvadsValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -435,7 +438,7 @@ public class SimpleValuesetService implements ValuesetService {
 					match(Criteria.where("name").is(theValueSetIdentifier)
 							.andOperator(Criteria.where("version").is(version))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
-					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
 					Hl7Valueset.class);
 			vs = result.getUniqueMappedResult();
@@ -444,7 +447,7 @@ public class SimpleValuesetService implements ValuesetService {
 			Aggregation aggregation = newAggregation(Hl7Valueset.class,
 					match(Criteria.where("name").is(theValueSetIdentifier)),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
-					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("name").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<Hl7Valueset> result = mongoTemplate.aggregate(aggregation, "hl7-valueset",
 					Hl7Valueset.class);
 			vs = result.getUniqueMappedResult();
@@ -489,7 +492,7 @@ public class SimpleValuesetService implements ValuesetService {
 							.andOperator(Criteria.where("version").is(version))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
 					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
-					replaceRoot("$doc"));
+					replaceRoot("$doc")).withOptions(options);
 			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 					AphlValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -500,7 +503,7 @@ public class SimpleValuesetService implements ValuesetService {
 							.andOperator(Criteria.where("name").is(theValueSetIdentifier))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
 					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
-					replaceRoot("$doc"));
+					replaceRoot("$doc")).withOptions(options);
 			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 					AphlValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -700,7 +703,7 @@ public class SimpleValuesetService implements ValuesetService {
 								.andOperator(Criteria.where("version").is(version))),
 						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
 						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
-						replaceRoot("$doc"));
+						replaceRoot("$doc")).withOptions(options);
 				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
 						CDCValueset.class);
 				cdcValueset = result.getUniqueMappedResult();
@@ -709,7 +712,7 @@ public class SimpleValuesetService implements ValuesetService {
 						match(Criteria.where("metadata.$id").is(new ObjectId(metadata.getId()))),
 						sort(Sort.Direction.DESC, "metadata").and(Sort.Direction.DESC, "version"),
 						group("metadata").first("version").as("version").first("$$ROOT").as("doc"),
-						replaceRoot("$doc"));
+						replaceRoot("$doc")).withOptions(options);
 				AggregationResults<CDCValueset> result = mongoTemplate.aggregate(aggregation, "cdc-valueset",
 						CDCValueset.class);
 				cdcValueset = result.getUniqueMappedResult();
@@ -756,7 +759,7 @@ public class SimpleValuesetService implements ValuesetService {
 					match(Criteria.where("oid").is(theValueSetIdentifier)
 							.andOperator(Criteria.where("version").is(version))),
 					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
-					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
 					PhinvadsValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -765,7 +768,7 @@ public class SimpleValuesetService implements ValuesetService {
 			Aggregation aggregation = newAggregation(PhinvadsValueset.class,
 					match(Criteria.where("oid").is(theValueSetIdentifier)),
 					sort(Sort.Direction.DESC, "oid").and(Sort.Direction.DESC, "version"),
-					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc"));
+					group("oid").first("version").as("version").first("$$ROOT").as("doc"), replaceRoot("$doc")).withOptions(options);
 			AggregationResults<PhinvadsValueset> result = mongoTemplate.aggregate(aggregation, "phinvads-valueset",
 					PhinvadsValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -893,7 +896,7 @@ public class SimpleValuesetService implements ValuesetService {
 							.andOperator(Criteria.where("version").is(version))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
 					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
-					replaceRoot("$doc"));
+					replaceRoot("$doc")).withOptions(options);
 			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 					AphlValueset.class);
 			vs = result.getUniqueMappedResult();
@@ -904,7 +907,7 @@ public class SimpleValuesetService implements ValuesetService {
 							.andOperator(Criteria.where("name").is(theValueSetIdentifier))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
 					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
-					replaceRoot("$doc"));
+					replaceRoot("$doc")).withOptions(options);
 			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 					AphlValueset.class);
 			vs = result.getUniqueMappedResult();

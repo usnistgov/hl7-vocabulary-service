@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOptions;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -47,11 +48,13 @@ public class AphlServiceImpl implements AphlService {
 		// TODO Auto-generated method stub
 		int addedVs = 0;
 		for (String key : map.keySet()) {
+			AggregationOptions options = AggregationOptions.builder().allowDiskUse(true).build();
+
 			Aggregation aggregation = newAggregation(AphlValueset.class,
 					match(Criteria.where("program").is(program).andOperator(Criteria.where("name").is(key))),
 					sort(Sort.Direction.DESC, "name").and(Sort.Direction.DESC, "version"),
 					group("name", "program").first("version").as("version").first("$$ROOT").as("doc"),
-					replaceRoot("$doc"));
+					replaceRoot("$doc")).withOptions(options);
 			AggregationResults<AphlValueset> result = mongoTemplate.aggregate(aggregation, "aphl-valueset",
 					AphlValueset.class);
 			AphlValueset vs = result.getUniqueMappedResult();
